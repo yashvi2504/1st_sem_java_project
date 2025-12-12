@@ -172,39 +172,70 @@
     </h:form>
 
     <!-- CATEGORY POPUP DIALOG -->
-    <p:dialog id="categoryDialog" widgetVar="categoryDialog" header="Category" modal="true" width="500">
+   <!-- CATEGORY POPUP DIALOG -->
+<p:dialog id="categoryDialog" widgetVar="categoryDialog" 
+          header="Category" modal="true" width="500">
 
-        <h:form id="categoryDialogForm" enctype="multipart/form-data">
+    <h:form id="categoryDialogForm" enctype="multipart/form-data">
 
-            <h:panelGrid columns="2" cellpadding="8">
+        <p:growl id="dlgMsgs" showDetail="true" />
 
-                <h:outputLabel value="Name:"/>
-                <p:inputText value="#{adminBean.selectedCategory.name}" required="true"/>
+        <h:panelGrid columns="2" cellpadding="8">
 
-                <h:outputLabel value="Description:"/>
-                <p:inputTextarea value="#{adminBean.selectedCategory.description}"/>
+              <h:outputLabel for="name" value="Name:" />
+                <p:inputText id="name"
+                             value="#{adminBean.selectedCategory.name}"
+                             required="true"
+                             requiredMessage="Category name is required."
+                             validatorMessage="Name must be at least 3 characters."
+                             style="width:95%;" >
+                    <f:validateLength minimum="3" />
+                </p:inputText>
+                <p:message for="name" />
+            <!-- DESCRIPTION -->
+    <!-- DESCRIPTION -->
+                <h:outputLabel for="desc" value="Description:" />
+                <p:inputTextarea id="desc"
+                                 value="#{adminBean.selectedCategory.description}"
+                                 required="true"
+                                 requiredMessage="Description is required."
+                                 validatorMessage="Description must be at least 5 characters."
+                                 style="width:95%;" >
+                    <f:validateLength minimum="5" />
+                </p:inputTextarea>
+                <p:message for="desc" />
+            <!-- IMAGE -->
+            <h:outputLabel for="img" value="Image:" />
 
-                <h:outputLabel value="Image:"/>
-                <p:fileUpload mode="simple"
-                              value="#{adminBean.categoryImage}"
-                              accept="image/*"
-                              label="Choose Image"/>
-            </h:panelGrid>
+            <p:fileUpload id="img"
+                          mode="simple"
+                          value="#{adminBean.categoryImage}"
+                          accept="image/*"
+                          label="Choose Image"
+                          required="#{adminBean.selectedCategory.categoryId == null}"
+                          requiredMessage="Please upload an image for the category." />
 
-            <div style="margin-top:10px; text-align:right;">
-                <p:commandButton value="Save"
-                                 actionListener="#{adminBean.saveCategory}"
-                                 update=":categoriesForm"
-                                 oncomplete="PF('categoryDialog').hide()"
-                                 styleClass="p-button-success"/>
+            <p:message for="img" />
 
-                <p:commandButton value="Cancel" type="button"
-                                 onclick="PF('categoryDialog').hide()"
-                                 styleClass="p-button-secondary"/>
-            </div>
-        </h:form>
+        </h:panelGrid>
 
-    </p:dialog>
+        <div style="margin-top:10px; text-align:right;">
+
+            <p:commandButton value="Save"
+                             actionListener="#{adminBean.saveCategory}"
+                             process="@form"
+                             update=":categoriesForm :categoryDialogForm:dlgMsgs"
+                             styleClass="p-button-success" />
+
+            <p:commandButton value="Cancel"
+                             type="button"
+                             onclick="PF('categoryDialog').hide()"
+                             styleClass="p-button-secondary"/>
+        </div>
+
+    </h:form>
+</p:dialog>
+
 
 </div>
 

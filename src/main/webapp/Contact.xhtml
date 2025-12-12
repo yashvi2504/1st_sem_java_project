@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Contact Us – Logic Pharmacy</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/primeflex@3.3.1/primeflex.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/primeicons/6.0.1/primeicons.min.css" />
+
+    <style>
+        body { margin: 0; background: #f5f7fa; font-family: "Segoe UI", sans-serif; }
+
+        .header {
+            background: white;
+            padding: 15px 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            font-size: 28px;
+            font-weight: bold;
+            color: #01756e;
+        }
+
+        .contact-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 35px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .contact-title {
+            color: #01756e;
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .contact-sub {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .contact-details {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+            justify-content: center;
+        }
+
+        .contact-box {
+            width: 300px;
+            background: #f0fdf9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 5px solid #01756e;
+        }
+
+        .contact-box i {
+            font-size: 30px;
+            color: #01756e;
+            margin-bottom: 10px;
+        }
+
+        .map {
+            width: 100%;
+            height: 330px;
+            border-radius: 12px;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        }
+
+        .footer {
+            background:#01756e;
+            color:white;
+            padding:25px 40px;
+            margin-top:40px;
+            text-align:center;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+<!-- HEADER -->
+<div class="header">Contact Us</div>
+<!-- BACK TO HOME LINK -->
+<div style="margin: 15px 40px;">
+    <a href="index.xhtml" 
+       style="text-decoration:none; color:#01756e; font-size:16px; font-weight:600;">
+        <i class="pi pi-arrow-left" style="margin-right:6px;"></i>
+        Back to Home
+    </a>
+</div>
+
+<!-- CONTACT FORM + DETAILS -->
+<div class="contact-container">
+
+    <div class="contact-title">We’d Love to Hear from You</div>
+    <div class="contact-sub">Have questions? Need help? Our support team is here for you.</div>
+
+    <!-- CONTACT DETAILS -->
+    <div class="contact-details">
+
+        <div class="contact-box">
+            <i class="pi pi-envelope"></i>
+            <h3>Email</h3>
+            <p>support@logicpharmacy.com</p>
+        </div>
+
+        <div class="contact-box">
+            <i class="pi pi-phone"></i>
+            <h3>Phone</h3>
+            <p>+91 98765 43210</p>
+        </div>
+
+        <div class="contact-box">
+            <i class="pi pi-map-marker"></i>
+            <h3>Address</h3>
+            <p>Logic Pharmacy, Ahmedabad, Gujarat, India</p>
+        </div>
+
+    </div>
+
+    <!-- CONTACT FORM -->
+    <h:form id="contactForm">
+
+        <div class="grid">
+
+            <div class="col-12 md:col-6">
+                <p:inputText value="#{contactBean.name}"
+                             placeholder="Your Name"
+                             required="true"
+                             style="width:100%; padding:12px; border-radius:8px;" />
+            </div>
+
+            <div class="col-12 md:col-6">
+                <p:inputText value="#{contactBean.email}"
+                             placeholder="Your Email"
+                             required="true"
+                             style="width:100%; padding:12px; border-radius:8px;" />
+            </div>
+
+            <div class="col-12">
+                <p:inputText value="#{contactBean.subject}"
+                             placeholder="Subject"
+                             style="width:100%; padding:12px; border-radius:8px;" />
+            </div>
+
+            <div class="col-12">
+                <p:inputTextarea value="#{contactBean.message}"
+                                 placeholder="Your Message"
+                                 rows="5"
+                                 style="width:100%; padding:12px; border-radius:8px;" />
+            </div>
+
+            <div class="col-12" style="text-align:center; margin-top:10px;">
+                <p:commandButton value="Send Message"
+                                 action="#{contactBean.sendMessage}"
+                                 update="@form"
+                                 style="padding:12px 30px; background:#01756e; color:white; border-radius:8px;" />
+            </div>
+
+        </div>
+
+    </h:form>
+
+    <!-- GOOGLE MAP -->
+    <iframe 
+        class="map"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3660.557149048397!2d72.55975507495989!3d23.0422249160557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x395e84f29a85bb79%3A0xa33b5be709fa7eb!2sAhmedabad%2C%20Gujarat!5e0!3m2!1sen!2sin!4v1700200000000"
+        allowfullscreen="" loading="lazy">
+    </iframe>
+
+</div>
+
+
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+    <div class="flex justify-content-between">
+        <div>
+            <h3>Logic Pharmacy</h3>
+            <p>Your trusted online pharmacy delivering authentic medicines.</p>
+        </div>
+
+        <div class="flex flex-column" style="gap:8px;">
+            <a href="About.xhtml" style="color:white; font-weight:bold;">About Us</a>
+            <a href="Contact.xhtml" style="color:white;">Contact</a>
+            <a href="Privacy.xhtml" style="color:white;">Privacy Policy</a>
+            <a href="Terms.xhtml" style="color:white;">Terms &amp; Conditions</a>
+        </div>
+    </div>
+
+    <hr style="border-top:1px solid rgba(255,255,255,0.3);" />
+
+    <p style="text-align:center;">
+        © #{homeBean.currentYear} Logic Pharmacy — All Rights Reserved
+    </p>
+</footer>
+
+</h:body>
+</html>

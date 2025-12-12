@@ -18,12 +18,38 @@
             margin: 0;
         }
 
-        .login-container {
+        /* MAIN WRAPPER */
+        .wrapper {
+            display: flex;
             background: white;
+            padding: 0;
+            border-radius: 14px;
+            box-shadow: 0 0 18px rgba(0,0,0,0.12);
+            overflow: hidden;
+            width: 800px;
+            max-width: 90%;
+        }
+
+        /* LEFT SIDE IMAGE */
+        .image-box {
+            width: 45%;
+            background: #eafaf8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .image-box img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        /* RIGHT SIDE FORM */
+        .login-container {
+            width: 55%;
             padding: 30px 40px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            width: 380px;
         }
 
         .login-container h2 {
@@ -93,7 +119,6 @@
             text-align: center;
         }
 
-        /* NEW – Skip Login Link */
         .skip-link {
             display: block;
             text-align: center;
@@ -107,58 +132,77 @@
             text-decoration: underline;
         }
 
+        /* RESPONSIVE */
+        @media (max-width: 700px) {
+            .wrapper {
+                flex-direction: column;
+            }
+            .image-box {
+                width: 100%;
+                height: 200px;
+            }
+            .login-container {
+                width: 100%;
+            }
+        }
     </style>
 </h:head>
 
 <h:body>
 
-    <div class="login-container">
+    <div class="wrapper">
+<div class="image-box">
+    <img src="https://cdn-icons-png.flaticon.com/512/2950/2950663.png"
+         alt="Pharmacy Login" />
+</div>
 
-        <h:form prependId="false">
-            <h2>Login</h2>
-            
-            <table class="login-table">
-                <tr>
-                    <td>Username</td>
-                    <td>
-                        <h:inputText value="#{loginBean.username}" />
-                    </td>
-                </tr>
 
-                <tr>
-                    <td>Password</td>
-                    <td>
-                        <h:inputSecret value="#{loginBean.password}" />
-                    </td>
-                </tr>
-            </table>
 
-            <div class="btn-row">
-                <h:commandButton value="Login" action="#{loginBean.login}" styleClass="btn" />
-                <h:commandButton value="Reset" type="reset" styleClass="btn btn-reset" />
-            </div>
 
-            <span class="error-text">
-                <h:outputText value="#{loginBean.errorStatus}" />
-            </span>
+        <!-- RIGHT SIDE FORM -->
+        <div class="login-container">
 
-            <!-- ⭐ NEW: Skip Login Link -->
-            <!--<a href="index.xhtml" class="skip-link">Skip Login → Go to Home</a>-->
-<!--<h:link value="Skip" outcome="index" />-->
-<!-- renders a GET link that points to /<context>/index.xhtml -->
-<!-- Login.xhtml -->
-<h:panelGroup layout="block" styleClass="skip-link" >
-    <h:link value="Skip → Go to Home" outcome="/index.xhtml" />
-</h:panelGroup>
-<!-- ⭐ NEW: Register Link -->
-<h:panelGroup layout="block" styleClass="skip-link">
-    <h:link value="Don't have an account? Register as Customer" outcome="/customerRegister.xhtml" />
-</h:panelGroup>
-<h:panelGroup layout="block" styleClass="skip-link">
-    <h:link value="Register as Delivery Partner" outcome="/deliveryPartnerRegister.xhtml" />
-</h:panelGroup>
+            <h:form prependId="false">
+                <h2>Login</h2>
 
-        </h:form>
+                <table class="login-table">
+                    <tr>
+                        <td>Username</td>
+                        <td><h:inputText value="#{loginBean.username}" /></td>
+                    </tr>
+
+                    <tr>
+                        <td>Password</td>
+                        <td><h:inputSecret value="#{loginBean.password}" /></td>
+                    </tr>
+                </table>
+
+                <div class="btn-row">
+                    <h:commandButton value="Login" action="#{loginBean.login}" styleClass="btn" />
+                    <h:commandButton value="Reset" type="reset" styleClass="btn btn-reset" />
+                </div>
+
+                <span class="error-text">
+                    <h:outputText value="#{loginBean.errorStatus}" />
+                </span>
+
+                <!-- SKIP LOGIN -->
+                <h:panelGroup layout="block" styleClass="skip-link">
+                    <h:link value="Skip → Go to Home" outcome="/index.xhtml" />
+                </h:panelGroup>
+
+                <!-- REGISTER LINKS -->
+                <h:panelGroup layout="block" styleClass="skip-link">
+                    <h:link value="Register as Customer" outcome="/customerRegister.xhtml" />
+                </h:panelGroup>
+
+                <h:panelGroup layout="block" styleClass="skip-link">
+                    <h:link value="Register as Delivery Partner" outcome="/deliveryPartnerRegister.xhtml" />
+                </h:panelGroup>
+
+            </h:form>
+
+        </div>
 
     </div>
 

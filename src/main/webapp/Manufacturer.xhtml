@@ -158,44 +158,64 @@
     </h:form>
 
     <!-- POPUP DIALOG -->
-    <p:dialog id="manufactureDialog"
-              widgetVar="manufactureDialog"
-              header="Manufacturer"
-              modal="true"
-              closable="true"
-              draggable="false"
-              resizable="false"
-              width="450">
+<p:dialog id="manufactureDialog"
+          widgetVar="manufactureDialog"
+          header="Manufacturer"
+          modal="true"
+          closable="true"
+          draggable="false"
+          resizable="false"
+          width="450">
 
-        <h:form id="manufactureDialogForm">
+    <h:form id="manufactureDialogForm">
 
-            <h:panelGrid columns="2" cellpadding="8">
+        <p:growl id="mfgMsgs" showDetail="true" />
 
-                <h:outputLabel value="Name:" />
-                <p:inputText value="#{adminBean.selectedManufacturer.name}" required="true" />
+        <h:panelGrid columns="2" cellpadding="8">
 
-                <h:outputLabel value="Contact Info:" />
-                <p:inputText value="#{adminBean.selectedManufacturer.contactInfo}" />
+            <!-- NAME -->
+           <!-- NAME -->
+<h:outputLabel for="mName" value="Name:" />
+<p:inputText id="mName"
+             value="#{adminBean.selectedManufacturer.name}"
+             required="true"
+             requiredMessage="Manufacturer name is required."
+             validatorMessage="Name must be at least 3 characters."
+             style="width:95%;">
+    <f:validateLength minimum="3" />
+</p:inputText>
+<p:message for="mName" />
 
-            </h:panelGrid>
+            <!-- CONTACT INFO -->
+            <h:outputLabel for="mContact" value="Contact Info:" />
+            <p:inputText id="mContact"
+                         value="#{adminBean.selectedManufacturer.contactInfo}"
+                         required="true"
+                         requiredMessage="Contact information is required."
+                         validatorMessage="Enter valid contact info (Email or Phone)."
+                         style="width:95%;">
+                <f:validateRegex pattern="^(.+@.+\..+|[0-9]{10})$" />
+            </p:inputText>
+            <p:message for="mContact" />
 
-            <div style="margin-top:10px; text-align:right;">
-                <p:commandButton value="Save"
-                                 actionListener="#{adminBean.saveManufacturer}"
-                                 update=":manufactureForm"
-                                 oncomplete="PF('manufactureDialog').hide()"
-                                 styleClass="p-button-success"/>
+        </h:panelGrid>
 
-                <p:commandButton value="Cancel"
-                                 type="button"
-                                 onclick="PF('manufactureDialog').hide()"
-                                 styleClass="p-button-secondary"/>
+        <div style="margin-top:10px; text-align:right;">
+            <p:commandButton value="Save"
+                             actionListener="#{adminBean.saveManufacturer}"
+                             process="@form"
+                             update=":manufactureForm :manufactureDialogForm:mfgMsgs"
+                             styleClass="p-button-success" />
 
-            </div>
+            <p:commandButton value="Cancel"
+                             type="button"
+                             onclick="PF('manufactureDialog').hide()"
+                             styleClass="p-button-secondary" />
+        </div>
 
-        </h:form>
+    </h:form>
 
-    </p:dialog>
+</p:dialog>
 
 </div>
 

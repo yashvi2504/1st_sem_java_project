@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <title>About Us – Logic Pharmacy</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/primeflex@3.3.1/primeflex.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/primeicons/6.0.1/primeicons.min.css" />
+
+    <style>
+        body { margin: 0; background: #f5f7fa; font-family: "Segoe UI", sans-serif; }
+
+        /* HEADER */
+        .header { 
+            background: white; 
+            padding: 15px 40px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        .logo { font-size: 28px; font-weight: bold; color: #01756e; }
+        .nav-link { text-decoration: none; color: #333; font-size: 16px; display:flex; align-items:center; gap:6px; }
+        .nav-link:hover { color:#01756e; }
+
+        /* ABOUT CONTENT BOX */
+        .about-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .about-container h1 {
+            color: #01756e;
+            font-size: 34px;
+            margin-bottom: 25px;
+        }
+        .about-container h3 {
+            color: #025e57;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+        .about-container h4 {
+            color: #01756e;
+            margin-top: 15px;
+        }
+        .about-container p, .about-container ul {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* TWO COLUMN IMAGE + TEXT SECTION */
+        .two-col {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+        }
+        .two-col img {
+            width: 45%;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        /* FOOTER */
+        .footer {
+            background:#01756e;
+            color:white;
+            padding:25px 40px;
+            margin-top:40px;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+<!-- ================= HEADER ================= -->
+<div class="header">
+
+    <div class="flex align-items-center justify-content-between">
+
+        <a href="index.xhtml" class="logo" style="text-decoration:none;">Logic Pharmacy</a>
+    <div style="margin: 15px 40px;">
+    <a href="index.xhtml" 
+       style="text-decoration:none; color:#01756e; font-size:16px; font-weight:600;">
+        <i class="pi pi-arrow-left" style="margin-right:6px;"></i>
+        Back to Home
+    </a>
+</div>
+        <div style="flex:1"></div>
+
+        <div class="flex align-items-center gap-4">
+
+            <h:panelGroup rendered="#{not empty loginBean.loggedUser}">
+                <a href="Profile.xhtml" class="nav-link">
+                    <i class="pi pi-user"></i> Hello, #{loginBean.loggedUser.username}
+                </a>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{empty loginBean.loggedUser}">
+                <a href="Login.xhtml" class="nav-link">
+                    <i class="pi pi-user"></i> Hello, Log in
+                </a>
+            </h:panelGroup>
+
+            <a class="nav-link" href="Cart.xhtml">
+                <i class="pi pi-shopping-cart"></i> Cart
+            </a>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= ABOUT SECTION ================= -->
+<div class="about-container">
+
+    <h1>About Logic Pharmacy</h1>
+
+    <p>
+        Welcome to <b>Logic Pharmacy</b>, your trusted online destination for 
+        high-quality medicines, wellness essentials, and healthcare products.
+        Our goal is simple — make healthcare more accessible, authentic, 
+        and effortless for everyone.
+    </p>
+
+    <!-- IMAGE + TEXT ROW -->
+    <div class="two-col">
+        <img src="https://images.pexels.com/photos/6129055/pexels-photo-6129055.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1200" />
+
+        <div>
+            <h3>💊 Our Mission</h3>
+            <p>
+                To bring genuine pharmaceuticals closer to customers with:
+            </p>
+            <ul>
+                <li>A large inventory of medicines &amp; OTC products</li>
+                <li>Guaranteed authenticity through strict quality checks</li>
+                <li>Fast &amp; trackable delivery services</li>
+                <li>Simple, secure, and user-friendly ordering</li>
+            </ul>
+        </div>
+    </div>
+
+    <h3>💡 Why Choose Logic Pharmacy?</h3>
+    <p>
+        Your health is our priority. Everything we do is focused on safety,
+        trust, and convenience.
+    </p>
+
+    <!-- SECOND IMAGE + TEXT -->
+    <div class="two-col">
+        <div>
+            <h4>1. Authenticity Guaranteed</h4>
+            <p>
+                All products are sourced from certified manufacturers and trusted suppliers.
+                Every item undergoes strict validation before shipping.
+            </p>
+
+            <h4>2. Fast &amp; Simple Ordering</h4>
+            <p>
+                Our platform makes it easy to find medicines, upload prescriptions,
+                and place orders without hassle.
+            </p>
+
+            <h4>3. Dedicated Support</h4>
+            <p>
+                Our team is always available to help with prescription queries,
+                dosage information, or order status.
+            </p>
+        </div>
+
+        <img src="https://images.pexels.com/photos/6730218/pexels-photo-6730218.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1200" />
+    </div>
+
+    <h3>🤝 Our Commitment to You</h3>
+    <p>
+        We continually work to expand our medical inventory, enhance 
+        platform reliability, and deliver a superior customer experience.
+        Thank you for trusting Logic Pharmacy with your healthcare needs.
+    </p>
+
+    <div style="text-align:center; margin-top:40px;">
+        <a href="Contact.xhtml" style="
+            padding: 12px 25px;
+            background: #01756e;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;">
+            Contact Our Team Today
+        </a>
+    </div>
+
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+    <div class="flex justify-content-between">
+        <div>
+            <h3>Logic Pharmacy</h3>
+            <p>Your trusted online pharmacy delivering authentic medicines.</p>
+        </div>
+
+        <div class="flex flex-column" style="gap:8px;">
+            <a href="About.xhtml" style="color:white; font-weight:bold;">About Us</a>
+            <a href="Contact.xhtml" style="color:white;">Contact</a>
+            <a href="Privacy.xhtml" style="color:white;">Privacy Policy</a>
+            <a href="Terms.xhtml" style="color:white;">Terms &amp; Conditions</a>
+        </div>
+    </div>
+
+    <hr style="border-top:1px solid rgba(255,255,255,0.3);" />
+
+    <p style="text-align:center;">
+        © #{homeBean.currentYear} Logic Pharmacy — All Rights Reserved
+    </p>
+</footer>
+
+</h:body>
+</html>
