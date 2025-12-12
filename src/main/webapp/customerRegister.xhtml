@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
@@ -47,8 +46,6 @@
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 6px;
-            transition: 0.3s;
-            outline: none;
         }
 
         input:focus {
@@ -68,7 +65,6 @@
             border-radius: 6px;
             cursor: pointer;
             font-size: 16px;
-            transition: 0.3s;
         }
 
         .btn:hover {
@@ -83,17 +79,6 @@
             text-decoration: none;
             font-size: 15px;
         }
-
-        .link:hover {
-            text-decoration: underline;
-        }
-
-        .error {
-            color: red;
-            display: block;
-            text-align: center;
-            margin-top: 12px;
-        }
     </style>
 </h:head>
 
@@ -106,34 +91,49 @@
 
             <h2>Create Customer Account</h2>
 
-            <h:messages globalOnly="true" style="color:red;" />
+            <!--<h:messages globalOnly="true" style="color:red;" />-->
+            <h:messages id="msg" showDetail="true" showSummary="true" style="color:red;" />
+
 
             <!-- Username -->
             <div class="field">
                 <label>Username</label>
                 <h:inputText value="#{customerBean.username}" required="true"
-                             requiredMessage="Username is required" />
+                             requiredMessage="Username is required"
+                             validatorMessage="Username must be at least 6 characters long">
+                    <f:validateLength minimum="6" />
+                    
+                </h:inputText>
             </div>
 
             <!-- Email -->
             <div class="field">
                 <label>Email</label>
                 <h:inputText value="#{customerBean.email}" required="true"
-                             requiredMessage="Email is required" />
+                             requiredMessage="Email is required"
+                             validatorMessage="Invalid email format">
+                    <f:validateRegex pattern="^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$" />
+                </h:inputText>
             </div>
 
             <!-- Phone -->
             <div class="field">
                 <label>Phone</label>
                 <h:inputText value="#{customerBean.phone}" required="true"
-                             requiredMessage="Phone is required" />
+                             requiredMessage="Phone number is required"
+                             validatorMessage="Phone must be exactly 10 digits">
+                    <f:validateRegex pattern="^[0-9]{10}$" />
+                </h:inputText>
             </div>
 
             <!-- Password -->
             <div class="field">
                 <label>Password</label>
                 <h:inputSecret value="#{customerBean.password}" required="true"
-                               requiredMessage="Password is required" />
+                               requiredMessage="Password is required"
+                               validatorMessage="Password must be at least 6 characters">
+                    <f:validateLength minimum="6" />
+                </h:inputSecret>
             </div>
 
             <!-- Confirm Password -->

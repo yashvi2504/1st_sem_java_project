@@ -30,9 +30,43 @@ public class HomeBean {
     }
     
     
-    public List<Medicines> getMedicines() {
-        return medicines;
+  public List<Medicines> getMedicines() {
+    if (filteredMedicines != null) {
+        return filteredMedicines;
     }
+
+    // show latest 8 when no search is applied
+    int size = medicines.size();
+    int fromIndex = Math.max(0, size - 8);
+    return medicines.subList(fromIndex, size);
+}
+public void searchMedicines() {
+    if (searchText == null || searchText.trim().isEmpty()) {
+        filteredMedicines = null; // reset to latest list
+        return;
+    }
+
+    String keyword = searchText.toLowerCase();
+
+    filteredMedicines = medicines.stream()
+        .filter(m -> m.getName().toLowerCase().contains(keyword))
+        .collect(java.util.stream.Collectors.toList());
+}
+
+
+public int getCurrentYear() {
+    return java.time.Year.now().getValue();
+}
+private String searchText = "";
+private List<Medicines> filteredMedicines;
+public String getSearchText() {
+    return searchText;
+}
+
+public void setSearchText(String searchText) {
+    this.searchText = searchText;
+}
+
     private Medicines selectedMedicine;
 
 public Medicines getSelectedMedicine() {
