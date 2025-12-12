@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Categories - Admin Dashboard</title>
+
+    <style>
+        body {
+            background: #f4f6f9;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        /* HEADER BAR */
+        .topbar {
+            height: 65px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding-left: 260px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #01756e;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 230px;
+            height: 100vh;
+            background: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            border-right: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #01756e;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar a:hover {
+            background: #e6f8f7;
+            border-left: 4px solid #01756e;
+        }
+
+        .sidebar .logout {
+            color: red;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            margin-left: 250px;
+            padding: 20px;
+        }
+    </style>
+
+</h:head>
+
+<h:body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <a href="Admin.xhtml">🏠 Dashboard</a>
+    <a href="Categories.xhtml">📦 Categories</a>
+    <a href="Manufacturer.xhtml">🏭 Manufacturer</a>
+    <a href="Medicines.xhtml">💊 Medicines</a>
+    <a href="Admin_Profile.xhtml">👥 Users</a>
+    <a href="Orders.xhtml">🛒 Orders</a>
+    <a href="Login.xhtml" class="logout">🚪 Logout</a>
+</div>
+
+<!-- HEADER BAR -->
+<div class="topbar">
+    Coup Admin Dashboard
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content-area">
+
+    <h:form id="categoriesForm" style="width:100%; max-width: 1000px;">
+
+        <p:growl id="msgs" showDetail="true" />
+
+        <!-- Search + Clear -->
+        <div class="p-field flex align-items-center my-3">
+            <p:inputText id="searchKeyword"
+                         value="#{adminBean.searchKeyword}"
+                         placeholder="Search by name"
+                         style="margin-right: 10px;"/>
+
+            <p:commandButton value="Search"
+                             icon="pi pi-search"
+                             actionListener="#{adminBean.searchCategories}"
+                             update="categoriesTable msgs"
+                             styleClass="p-button-secondary mr-2" />
+
+            <p:commandButton value="Clear"
+                             icon="pi pi-times"
+                             actionListener="#{adminBean.clearSearch}"
+                             update="categoriesTable searchKeyword msgs"
+                             styleClass="p-button-secondary"/>
+        </div>
+
+        <!-- Add Category Button -->
+        <p:commandButton value="Add Category"
+                         icon="pi pi-plus"
+                         styleClass="p-button-success mb-3"
+                         update=":categoryDialog"
+                         actionListener="#{adminBean.openNewCategory}"
+                         oncomplete="PF('categoryDialog').show()"/>
+
+        <!-- TABLE -->
+  <p:dataTable id="categoriesTable"
+             value="#{adminBean.categoriesList}"
+             var="c"
+             rows="10"
+             paginator="true"
+             paginatorPosition="bottom"
+             rowsPerPageTemplate="10,20,50"
+             style="width:100%;">
+
+            <p:column headerText="ID">
+                <h:outputText value="#{c.categoryId}" />
+            </p:column>
+
+            <p:column headerText="Name">
+                <h:outputText value="#{c.name}" />
+            </p:column>
+
+            <p:column headerText="Description">
+                <h:outputText value="#{c.description}" />
+            </p:column>
+
+            <p:column headerText="Image">
+                <h:panelGroup>
+                    <h:graphicImage
+                        library="category_images"
+                        name="#{c.image}"
+                        width="60" height="60"
+                        rendered="#{not empty c.image}" />
+
+                    <h:outputText value="No Image"
+                                  rendered="#{empty c.image}" />
+                </h:panelGroup>
+            </p:column>
+
+            <p:column headerText="Actions">
+                <p:commandButton icon="pi pi-pencil"
+                                 update=":categoryDialog"
+                                 actionListener="#{adminBean.openEditCategory(c)}"
+                                 oncomplete="PF('categoryDialog').show()"
+                                 styleClass="p-button-rounded p-button-warning mr-2"/>
+
+                <p:commandButton icon="pi pi-trash"
+                                 actionListener="#{adminBean.deleteCategory(c)}"
+                                 update="categoriesForm"
+                                 styleClass="p-button-rounded p-button-danger"/>
+            </p:column>
+
+        </p:dataTable>
+    </h:form>
+
+    <!-- CATEGORY POPUP DIALOG -->
+    <p:dialog id="categoryDialog" widgetVar="categoryDialog" header="Category" modal="true" width="500">
+
+        <h:form id="categoryDialogForm" enctype="multipart/form-data">
+
+            <h:panelGrid columns="2" cellpadding="8">
+
+                <h:outputLabel value="Name:"/>
+                <p:inputText value="#{adminBean.selectedCategory.name}" required="true"/>
+
+                <h:outputLabel value="Description:"/>
+                <p:inputTextarea value="#{adminBean.selectedCategory.description}"/>
+
+                <h:outputLabel value="Image:"/>
+                <p:fileUpload mode="simple"
+                              value="#{adminBean.categoryImage}"
+                              accept="image/*"
+                              label="Choose Image"/>
+            </h:panelGrid>
+
+            <div style="margin-top:10px; text-align:right;">
+                <p:commandButton value="Save"
+                                 actionListener="#{adminBean.saveCategory}"
+                                 update=":categoriesForm"
+                                 oncomplete="PF('categoryDialog').hide()"
+                                 styleClass="p-button-success"/>
+
+                <p:commandButton value="Cancel" type="button"
+                                 onclick="PF('categoryDialog').hide()"
+                                 styleClass="p-button-secondary"/>
+            </div>
+        </h:form>
+
+    </p:dialog>
+
+</div>
+
+</h:body>
+</html>

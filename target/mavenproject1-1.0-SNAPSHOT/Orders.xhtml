@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <title>Your Orders - Logic Pharmacy</title>
+
+    <style>
+        body { background:#f4f6f9; font-family:Arial; }
+
+        .box {
+               background: white;
+    width: 1233px;
+    margin: -15px auto;
+    padding: 25px;
+    margin-left: -1%;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+        h2 { color:#01756e; margin-bottom:20px; }
+
+        table {
+            width:100%;
+            font-size:15px;
+            border-collapse:collapse;
+        }
+
+        th {
+            background:#d5eaff;
+            padding:10px;
+            text-align:left;
+        }
+
+        td {
+            background:white;
+            padding:10px;
+            border-bottom:1px solid #ddd;
+        }
+
+        .badge {
+            padding:5px 12px;
+            border-radius:6px;
+            font-size:13px;
+            font-weight:bold;
+            color:white;
+        }
+        .pending { background:#ff9800; }
+        .processing { background:#2196f3; }
+        .shipped { background:#673ab7; }
+        .delivered { background:#4caf50; }
+        .cancelled { background:#f44336; }
+
+        .btn {
+            padding:6px 12px;
+            background:#01756e;
+            color:white;
+            border-radius:5px;
+            font-size:13px;
+            text-decoration:none;
+        }
+
+        .btn:hover { background:#025e57; }
+
+
+      body {
+            background: #f4f6f9;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        /* HEADER BAR */
+        .topbar {
+            height: 65px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding-left: 260px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #01756e;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 230px;
+            height: 100vh;
+            background: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            border-right: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #01756e;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar a:hover {
+            background: #e6f8f7;
+            border-left: 4px solid #01756e;
+        }
+
+        .sidebar .logout {
+            color: red;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+    </style>
+</h:head>
+
+
+<h:body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <a href="Admin.xhtml">🏠 Dashboard</a>
+    <a href="Categories.xhtml">📦 Categories</a>
+    <a href="Manufacturer.xhtml">🏭 Manufacturer</a>
+    <a href="Medicines.xhtml">💊 Medicines</a>
+    <a href="Admin_Profile.xhtml">👥 Users</a>
+    <a href="Orders.xhtml">🛒 Orders</a>
+    <a href="Login.xhtml" class="logout">🚪 Logout</a>
+</div>
+
+<!-- HEADER BAR -->
+<div class="topbar">
+    Coup Admin Dashboard
+</div>
+<!-- CONTENT AREA -->
+<div class="content-area">
+
+    <div class="box">
+        <h2>Your Orders</h2>
+
+        <h:panelGroup id="orderList">
+
+            <!-- No orders -->
+            <h:panelGroup rendered="#{empty orderBean.orderList}">
+                <div style="color:#888; font-size:16px;">
+                    You have not placed any orders yet.
+                </div>
+            </h:panelGroup>
+
+            <!-- Orders exist -->
+            <h:panelGroup rendered="#{not empty orderBean.orderList}">
+                <table>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                        <th>Payment</th>
+                        <th>Address</th>
+                        <th>Action</th>
+                    </tr>
+
+                    <ui:repeat value="#{orderBean.orderList}" var="o">
+
+                        <tr>
+                            <td>#{o.orderId}</td>
+                            <td>#{o.orderDate}</td>
+
+                            <td>
+                                <span class="badge
+                                    #{o.status.toLowerCase() eq 'pending' ? 'pending' : ''}
+                                    #{o.status.toLowerCase() eq 'processing' ? 'processing' : ''}
+                                    #{o.status.toLowerCase() eq 'shipped' ? 'shipped' : ''}
+                                    #{o.status.toLowerCase() eq 'delivered' ? 'delivered' : ''}
+                                    #{o.status.toLowerCase() eq 'cancelled' ? 'cancelled' : ''}">
+                                    #{o.status}
+                                </span>
+                            </td>
+
+                            <td>₹#{o.totalAmount}</td>
+                            <td>#{o.paymentMethod}</td>
+
+                            <td>
+                                #{o.addressId.city}, #{o.addressId.state}
+                                <br/>
+                                <small>#{o.addressId.pincode}</small>
+                            </td>
+
+                            <td>
+                                <a class="btn" href="OrderDetails.xhtml?orderId=#{o.orderId}">
+                                    View Details
+                                </a>
+
+                                <a class="btn" style="background:#673ab7;"
+                                   href="TrackOrder.xhtml?orderId=#{o.orderId}">
+                                    Track
+                                </a>
+                            </td>
+                        </tr>
+
+                    </ui:repeat>
+                </table>
+            </h:panelGroup>
+
+        </h:panelGroup>
+    </div>
+
+</div> <!-- ← FIXED! This was missing -->
+
+</h:body>
+</html>

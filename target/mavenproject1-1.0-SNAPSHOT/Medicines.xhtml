@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Medicines - Admin Dashboard</title>
+
+    <style>
+        body {
+            background: #f4f6f9;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        /* HEADER BAR */
+        .topbar {
+            height: 65px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding-left: 260px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #01756e;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 230px;
+            height: 100vh;
+            background: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            border-right: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #01756e;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar a:hover {
+            background: #e6f8f7;
+            border-left: 4px solid #01756e;
+        }
+
+        .sidebar .logout {
+            color: red;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        /* Medicine Image Preview Hover */
+        .clickable-img {
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .clickable-img:hover {
+            transform: scale(1.09);
+        }
+        /* LOW STOCK SCROLLER */
+.low-stock-banner {
+    width: 100%;
+    background: #ff3b3b;
+    color: white;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.low-stock-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll-left 10s linear infinite;
+}
+
+@keyframes scroll-left {
+    0%   { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+/* LOW STOCK SCROLLER */
+.low-stock-banner {
+    width: 100%;
+    background: #ff3b3b;
+    color: white;
+    padding: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.low-stock-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scroll-left 10s linear infinite;
+}
+
+@keyframes scroll-left {
+    0%   { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+    </style>
+</h:head>
+
+<h:body>
+
+<!-- FULLSCREEN IMAGE VIEWER -->
+<div id="fullscreenViewer" style="
+    display:none;
+    position:fixed;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.9);
+    justify-content:center;
+    align-items:center;
+    z-index:99999;">
+
+    <img id="fullImage" src="#" 
+         style="max-width:90%; max-height:90%; border-radius:10px;"/>
+</div>
+
+<!-- SIDEBAR -->
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <a href="Admin.xhtml">🏠 Dashboard</a>
+    <a href="Categories.xhtml">📦 Categories</a>
+    <a href="Manufacturer.xhtml">🏭 Manufacturer</a>
+    <a href="Medicines.xhtml">💊 Medicines</a>
+    <a href="Admin_Profile.xhtml">👥 Users</a>
+    <a href="Orders.xhtml">🛒 Orders</a>
+    <a href="Login.xhtml" class="logout">🚪 Logout</a>
+</div>
+
+<!-- HEADER -->
+<div class="topbar">
+    Coup Admin Dashboard
+</div>
+
+
+<!-- MAIN CONTENT -->
+<div class="content-area">
+<!-- LOW STOCK WARNING -->
+<h:panelGroup rendered="#{adminBean.lowStockAvailable}">
+    <div class="low-stock-banner">
+        <span class="low-stock-text">
+            ⚠ Low Stock Medicines: #{adminBean.lowStockMessage}
+        </span>
+    </div>
+</h:panelGroup>
+
+    <!-- Image Preview Dialog -->
+    <p:dialog id="imgPreviewDialog" widgetVar="imgPreviewDialog"
+              modal="true" width="450" closable="true" resizable="false">
+        <h:graphicImage id="previewImage"
+                        value="#{adminBean.previewImagePath}"
+                        style="width:100%; border-radius:10px;" />
+    </p:dialog>
+
+    <h:form id="medForm" style="width:100%; max-width:1000px;">
+
+        <p:growl id="msgs" showDetail="true" />
+
+        <!-- SEARCH BAR -->
+        <div class="p-field flex align-items-center my-3">
+            <p:inputText value="#{adminBean.medicineSearchKeyword}"
+                         placeholder="Search by name"
+                         style="margin-right: 10px;"/>
+
+            <p:commandButton value="Search" icon="pi pi-search"
+                             actionListener="#{adminBean.searchMedicines}"
+                             update="medTable msgs"
+                             styleClass="p-button-secondary mr-2"/>
+
+            <p:commandButton value="Clear" icon="pi pi-times"
+                             actionListener="#{adminBean.clearMedicineSearch}"
+                             update="medTable msgs"
+                             styleClass="p-button-secondary"/>
+        </div>
+
+        <!-- ADD MEDICINE BUTTON -->
+        <p:commandButton value="Add Medicine" icon="pi pi-plus"
+                         styleClass="p-button-success mb-3"
+                         update=":medDialog"
+                         actionListener="#{adminBean.openNewMedicine}"
+                         oncomplete="PF('medDialog').show()"/>
+
+        <!-- MEDICINES TABLE -->
+        <p:dataTable id="medTable"
+                     value="#{adminBean.medicinesList}"
+                     var="m"
+                     rows="10"
+                     paginator="true"
+                     rowsPerPageTemplate="10,20,50"
+                     style="width:100%;">
+
+            <p:column headerText="ID">
+                <h:outputText value="#{m.medicineId}" />
+            </p:column>
+
+            <p:column headerText="Name">
+                <h:outputText value="#{m.name}" />
+            </p:column>
+
+            <p:column headerText="Brand">
+                <h:outputText value="#{m.brand}" />
+            </p:column>
+
+            <p:column headerText="Price">
+                <h:outputText value="#{m.price}" />
+            </p:column>
+
+            <p:column headerText="Stock">
+                <h:outputText value="#{m.stock}" />
+            </p:column>
+
+            <p:column headerText="Pack Of">
+                <h:outputText value="#{m.packOf}" />
+            </p:column>
+
+            <p:column headerText="Expiry Date">
+                <h:outputText value="#{m.expiryDate}" />
+            </p:column>
+
+            <p:column headerText="Description" style="max-width:200px; white-space:normal;">
+                <h:outputText value="#{m.description}" />
+            </p:column>
+
+            <p:column headerText="Category">
+                <h:outputText value="#{m.categoryId.name}" />
+            </p:column>
+
+            <p:column headerText="Manufacturer">
+                <h:outputText value="#{m.manufacturerId.name}" />
+            </p:column>
+
+            <p:column headerText="Picture">
+                <h:graphicImage value="/medicine_images/#{m.picture}"
+                                width="60"
+                                style="cursor:pointer; border-radius:5px;"
+                                rendered="#{not empty m.picture}"
+                                onclick="openFullScreenImage('#{m.picture}')"/>
+            </p:column>
+
+            <p:column headerText="Actions">
+                <p:commandButton icon="pi pi-pencil"
+                                 update=":medDialog"
+                                 actionListener="#{adminBean.openEditMedicine(m)}"
+                                 oncomplete="PF('medDialog').show()"
+                                 styleClass="p-button-rounded p-button-warning mr-2"/>
+
+                <p:commandButton icon="pi pi-trash"
+                                 actionListener="#{adminBean.deleteMedicine(m)}"
+                                 update="medForm"
+                                 styleClass="p-button-rounded p-button-danger"/>
+            </p:column>
+
+        </p:dataTable>
+
+    </h:form>
+
+    <!-- DIALOG: ADD/EDIT MEDICINE -->
+    <p:dialog id="medDialog" widgetVar="medDialog"
+              header="Medicine"
+              modal="true"
+              closable="true"
+              draggable="false"
+              resizable="false"
+              width="550">
+
+        <h:form id="medDialogForm" enctype="multipart/form-data">
+
+            <h:panelGrid columns="2" cellpadding="8">
+
+                <h:outputLabel value="Name:"/>
+                <p:inputText value="#{adminBean.selectedMedicine.name}" required="true"/>
+
+                <h:outputLabel value="Brand:"/>
+                <p:inputText value="#{adminBean.selectedMedicine.brand}" />
+
+                <h:outputLabel value="Price:"/>
+                <p:inputNumber value="#{adminBean.selectedMedicine.price}" required="true"/>
+
+                <h:outputLabel value="Stock:"/>
+                <p:inputNumber value="#{adminBean.selectedMedicine.stock}" required="true"/>
+
+                <h:outputLabel value="Pack Of:"/>
+                <p:inputNumber value="#{adminBean.selectedMedicine.packOf}" />
+
+                <h:outputLabel value="Expiry:"/>
+                <p:datePicker value="#{adminBean.selectedMedicine.expiryDate}" pattern="yyyy-MM-dd"/>
+
+                <h:outputLabel value="Description:"/>
+                <p:inputTextarea rows="3" value="#{adminBean.selectedMedicine.description}"/>
+
+                <h:outputLabel value="Category:"/>
+                <p:selectOneMenu value="#{adminBean.selectedCategoryId}">
+                    <f:selectItems value="#{adminBean.categoriesList}"
+                                   var="c"
+                                   itemValue="#{c.categoryId}"
+                                   itemLabel="#{c.name}"/>
+                </p:selectOneMenu>
+
+                <h:outputLabel value="Manufacturer:"/>
+                <p:selectOneMenu value="#{adminBean.selectedManufacturerId}">
+                    <f:selectItems value="#{adminBean.manufacturersList}"
+                                   var="mm"
+                                   itemValue="#{mm.manufacturerId}"
+                                   itemLabel="#{mm.name}"/>
+                </p:selectOneMenu>
+
+                <h:outputLabel value="Picture:"/>
+                <p:fileUpload mode="simple"
+                              value="#{adminBean.pictureFile}"
+                              allowTypes="/(\.|\/)(png|jpg|jpeg)$/"/>
+            </h:panelGrid>
+
+            <div style="margin-top:10px; text-align:right;">
+                <p:commandButton value="Save"
+                                 actionListener="#{adminBean.saveMedicine}"
+                                 update=":medForm"
+                                 oncomplete="PF('medDialog').hide()"
+                                 styleClass="p-button-success"/>
+
+                <p:commandButton value="Cancel" type="button"
+                                 onclick="PF('medDialog').hide()"
+                                 styleClass="p-button-secondary"/>
+            </div>
+
+        </h:form>
+
+    </p:dialog>
+
+</div>
+
+<!-- FULLSCREEN IMAGE JS -->
+<script>
+    function openFullScreenImage(img) {
+        const viewer = document.getElementById("fullscreenViewer");
+        const fullImg = document.getElementById("fullImage");
+        fullImg.src = "#{request.contextPath}/medicine_images/" + img;
+        viewer.style.display = "flex";
+    }
+
+    document.addEventListener("click", function(e) {
+        const viewer = document.getElementById("fullscreenViewer");
+        if (e.target.id === "fullscreenViewer") viewer.style.display = "none";
+    });
+
+    document.addEventListener("keydown", function(e){
+        if (e.key === "Escape")
+            document.getElementById("fullscreenViewer").style.display = "none";
+    });
+</script>
+
+</h:body>
+</html>

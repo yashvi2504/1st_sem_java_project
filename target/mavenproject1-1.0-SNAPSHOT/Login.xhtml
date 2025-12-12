@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Login – Logic Pharmacy</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            width: 380px;
+        }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .login-table {
+            width: 100%;
+        }
+
+        .login-table td {
+            padding: 10px 0;
+            font-size: 16px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        .ui-inputfield {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #3498db;
+        }
+
+        .btn-row {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            background: #3498db;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn-reset {
+            background: #95a5a6;
+        }
+
+        .btn-reset:hover {
+            background: #7f8c8d;
+        }
+
+        .error-text {
+            color: red;
+            margin-top: 15px;
+            display: block;
+            text-align: center;
+        }
+
+        /* NEW – Skip Login Link */
+        .skip-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #3498db;
+            font-size: 15px;
+            text-decoration: none;
+        }
+
+        .skip-link:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</h:head>
+
+<h:body>
+
+    <div class="login-container">
+
+        <h:form prependId="false">
+            <h2>Login</h2>
+            
+            <table class="login-table">
+                <tr>
+                    <td>Username</td>
+                    <td>
+                        <h:inputText value="#{loginBean.username}" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Password</td>
+                    <td>
+                        <h:inputSecret value="#{loginBean.password}" />
+                    </td>
+                </tr>
+            </table>
+
+            <div class="btn-row">
+                <h:commandButton value="Login" action="#{loginBean.login}" styleClass="btn" />
+                <h:commandButton value="Reset" type="reset" styleClass="btn btn-reset" />
+            </div>
+
+            <span class="error-text">
+                <h:outputText value="#{loginBean.errorStatus}" />
+            </span>
+
+            <!-- ⭐ NEW: Skip Login Link -->
+            <!--<a href="index.xhtml" class="skip-link">Skip Login → Go to Home</a>-->
+<!--<h:link value="Skip" outcome="index" />-->
+<!-- renders a GET link that points to /<context>/index.xhtml -->
+<!-- Login.xhtml -->
+<h:panelGroup layout="block" styleClass="skip-link" >
+    <h:link value="Skip → Go to Home" outcome="/index.xhtml" />
+</h:panelGroup>
+<!-- ⭐ NEW: Register Link -->
+<h:panelGroup layout="block" styleClass="skip-link">
+    <h:link value="Don't have an account? Register as Customer" outcome="/customerRegister.xhtml" />
+</h:panelGroup>
+<h:panelGroup layout="block" styleClass="skip-link">
+    <h:link value="Register as Delivery Partner" outcome="/deliveryPartnerRegister.xhtml" />
+</h:panelGroup>
+
+        </h:form>
+
+    </div>
+
+</h:body>
+</html>

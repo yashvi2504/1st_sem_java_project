@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Your Cart</title>
+</h:head>
+
+<h:body>
+
+    <a href="index.xhtml" 
+       style="margin-left:40px; font-size:16px; color:#01756e; text-decoration:none;">
+         ← Back to Shop
+    </a>
+
+    <h1 style="margin-left:40px;">Your Cart</h1>
+
+    <h:form id="mainForm">
+
+        <p:growl id="msgs" showDetail="true" />
+
+        <p:dataTable value="#{cartBean.cartItems}" var="ci"
+                     style="width:95%; margin:auto;">
+
+            <p:column headerText="Medicine">
+                #{ci.medicineId.name}
+            </p:column>
+
+            <p:column headerText="Qty">
+                <div style="display:flex; align-items:center; gap:10px;">
+
+                    <p:commandButton value="-" 
+                                     style="background:#ccc; color:black; width:35px;"
+                                     actionListener="#{customerBean.decrease(ci.medicineId.medicineId)}" update="@form" />
+
+                    <span style="font-size:18px; font-weight:bold;">
+                        #{customerBean.quantity(ci.medicineId.medicineId)} </span>
+
+                    <p:commandButton value="+" 
+                                     style="background:#01756e; color:white; width:35px;"
+                                     actionListener="#{customerBean.increase(ci.medicineId.medicineId)}" update="@form" />
+
+                </div>
+            </p:column>
+
+
+          <p:column headerText="Line Total">
+    ₹#{(ci.pricePerUnit * ci.quantity)}
+</p:column>
+
+            <p:column headerText="Prescription">
+
+                <h:panelGroup rendered="#{ci.medicineId.prescriptionRequired}">
+                    <span style="color:red;">Required</span><br/>
+
+                    <p:commandButton value="Upload"
+                                     action="#{cartBean.preparePrescriptionUpload(ci.medicineId.medicineId)}"
+                                     update=":prescForm"
+                                     oncomplete="PF('prescDialogVar').show();" />
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{!ci.medicineId.prescriptionRequired}">
+                    <span style="color:green;">Not Required</span>
+                </h:panelGroup>
+
+            </p:column>
+
+            <p:column headerText="Actions">
+                <p:commandButton value="Remove"
+                                 actionListener="#{cartBean.remove(ci.cartItemId)}"
+                                 update="mainForm" />
+            </p:column>
+
+        </p:dataTable>
+
+
+        <h3 style="margin-left:40px; margin-top:20px; color:#01756e;">
+            <strong>Available Offer:</strong>
+        </h3>
+
+        <h:panelGroup rendered="#{cartBean.appliedOffer != null}">
+            <div style="margin-left:40px; color:green; font-size:18px;">
+                🎁 <b>#{cartBean.appliedOffer.offerTitle}</b><br/>
+                #{cartBean.appliedOffer.offerDescription}<br/><br/>
+                <b>Discount Applied!</b>
+            </div>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{cartBean.appliedOffer == null}">
+            <div style="margin-left:40px; color:red;">
+                No offer available.
+            </div>
+        </h:panelGroup>
+
+        <h3 style="margin-left:40px; margin-top:20px;">
+            Total: ₹#{cartBean.total}
+        </h3>
+
+        <h3 style="margin-left:40px; margin-top:20px;">Choose Payment Method</h3>
+
+        <p:selectOneRadio value="#{cartBean.paymentMethod}" style="margin-left:40px;">
+            <f:selectItem itemLabel="COD (Cash on Delivery)" itemValue="COD" />
+            <f:selectItem itemLabel="Online Payment" itemValue="ONLINE" />
+        </p:selectOneRadio>
+
+        <p:commandButton value="Place Order"
+                         icon="pi pi-check"
+                         actionListener="#{cartBean.confirmOrder}"
+                         update="mainForm"
+                         oncomplete="if (args.showAddressDialog) PF('addressDlg').show();"
+                         style="margin-left:40px; margin-top:10px;
+                                 background:#01756e; color:white; padding:10px 20px;" />
+
+    </h:form>
+
+
+    <p:dialog header="Add Delivery Address" widgetVar="addressDlg" modal="true" width="400">
+        <h:form id="addressForm">
+
+            <h:panelGrid columns="2" cellpadding="5">
+
+                <h:outputLabel value="Street:" />
+                <p:inputText value="#{customerBean.street}" required="true" />
+
+                <h:outputLabel value="City:" />
+                <p:inputText value="#{customerBean.city}" required="true" />
+
+                <h:outputLabel value="State:" />
+                <p:inputText value="#{customerBean.state}" required="true" />
+
+                <h:outputLabel value="Pincode:" />
+                <p:inputText value="#{customerBean.zip}" required="true" />
+
+            </h:panelGrid>
+
+            <p:commandButton value="Save"
+                             actionListener="#{customerBean.addAddress}"
+                             update="addressForm :mainForm"
+                             oncomplete="PF('addressDlg').hide();" />
+
+        </h:form>
+    </p:dialog>
+
+
+    <p:dialog id="prescDialog" header="Upload Prescription"
+              widgetVar="prescDialogVar" modal="true" width="400">
+
+        <h:form id="prescForm" enctype="multipart/form-data">
+
+            <p:fileUpload mode="simple"
+                          value="#{cartBean.uploadedPrescription}"
+                          allowTypes="/(\.|\/)(png|jpg|jpeg|pdf)$/"
+                          label="Choose File" />
+
+            <br/><br/>
+
+            <p:commandButton value="Upload"
+                             actionListener="#{cartBean.uploadPrescription}"
+                             ajax="false"
+                             update=":mainForm :mainForm:msgs"
+                             oncomplete="PF('prescDialogVar').hide();" />
+
+        </h:form>
+    </p:dialog>
+
+</h:body>
+</html>

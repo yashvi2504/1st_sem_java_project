@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <title>Logic Pharmacy</title>
+
+    <!-- PrimeFlex -->
+    <link rel="stylesheet" href="https://unpkg.com/primeflex@3.3.1/primeflex.css" />
+    <!-- PrimeIcons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/primeicons/6.0.1/primeicons.min.css" />
+
+    <style>
+        body { margin: 0; background: #f5f7fa; font-family: "Segoe UI", sans-serif; }
+        .header { background: white; padding: 15px 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .logo { font-size: 28px; font-weight: bold; color: #01756e; }
+        .nav-link { text-decoration: none; color: #333; font-size: 16px; cursor:pointer; display:flex; align-items:center; gap:6px; }
+        .nav-link:hover { color:#01756e; }
+        .content { text-align: center; padding: 40px; }
+        .category-scroll { display:flex; gap:25px; overflow-x:auto; padding-bottom:10px; scrollbar-width:none; }
+        .category-card { min-width: 160px; text-align:center; }
+    </style>
+</h:head>
+
+<h:body>
+
+<!-- HEADER -->
+<div class="header">
+    <div class="flex justify-content-between align-items-center">
+
+        <!-- LEFT -->
+        <div class="flex align-items-center gap-5">
+            <span class="logo">Logic Pharmacy</span>
+
+            <h:form style="display:flex; gap:15px;">
+                <p:commandButton value="➕ Add Address"
+                                 onclick="PF('addressDlg').show();"
+                                 style="background:#01756e; color:white;" />
+
+                <p:commandButton value="📍 Select Address"
+                                 rendered="#{not empty customerBean.userAddresses}"
+                                 onclick="PF('selectAddressDlg').show();"
+                                 style="background:#025e57; color:white;" />
+            </h:form>
+
+            <!-- DELIVERING TO -->
+            <h:form id="addressInfoForm">
+                <h:panelGroup id="selectedAddress" 
+                              rendered="#{customerBean.selectedAddress != null}"
+                              style="margin-left:30px;">
+
+                    <b style="color:#01756e;">Delivering to:</b><br/>
+                    #{customerBean.selectedAddress.state}
+                    -
+                    #{customerBean.selectedAddress.pincode}
+                </h:panelGroup>
+            </h:form>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div class="flex align-items-center gap-4">
+
+            <h:panelGroup rendered="#{not empty loginBean.loggedUser}">
+                <a href="Profile.xhtml" class="nav-link">
+                    <i class="pi pi-user"></i> Hello, #{loginBean.loggedUser.username}
+                </a>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{empty loginBean.loggedUser}">
+                <a href="Login.xhtml" class="nav-link">
+                    <i class="pi pi-user"></i> Hello, Log in
+                </a>
+            </h:panelGroup>
+
+            <a class="nav-link" href="Cart.xhtml">
+                <i class="pi pi-shopping-cart"></i> Cart
+            </a>
+
+        </div>
+
+    </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+    <h2 style="font-size: 28px; font-weight: 600;">Shop by Categories</h2>
+
+    <div id="catScroll" class="category-scroll">
+
+        <ui:repeat value="#{homeBean.categories}" var="c">
+            <div class="category-card">
+                <div style="width:150px; height:150px; background:white;
+                            border-radius:12px; padding:10px;
+                            box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                    <h:graphicImage library="category_images" 
+                                    name="#{c.image}"
+                                    style="width:100%; height:100%; object-fit:contain;" />
+                </div>
+                <div style="margin-top:10px; font-size:16px;">
+                    #{c.name}
+                </div>
+            </div>
+        </ui:repeat>
+
+    </div>
+</div>
+
+<!-- BEST SELLING -->
+<h2 style="margin-left: 50px; font-size: 28px; font-weight: 600;">Best Selling Medicines</h2>
+
+<div style="display:flex; gap:25px; overflow-x:auto; padding:20px 40px;">
+
+    <ui:repeat value="#{homeBean.medicines}" var="m">
+
+        <div style="width:200px; background:white; padding:15px; border-radius:12px;
+                    box-shadow:0 2px 12px rgba(0,0,0,0.15); text-align:center;">
+
+            <!-- CLICK TO OPEN POPUP -->
+            <p:commandLink process="@this"
+                           actionListener="#{homeBean.openMedicine(m)}"
+                           update=":medicineForm:medicineDialogContent"
+                           oncomplete="PF('medicineDlg').show();">
+
+                <img src="medicine_images/#{m.picture}"
+                     style="width:160px; height:160px; object-fit:contain;" />
+            </p:commandLink>
+
+            <div style="font-size:17px; font-weight:600;">#{m.name}</div>
+            <div style="font-size:14px; color:gray;">#{m.brand}</div>
+
+            <div style="margin-top:8px; font-size:18px; color:#01756e;">
+                ₹#{m.price}
+            </div>
+
+            <div style="font-size:13px;">Pack of #{m.packOf}</div>
+
+        </div>
+
+    </ui:repeat>
+
+</div>
+
+<h:form id="medicineForm">
+
+    <p:dialog header="#{homeBean.selectedMedicine.name}"
+              widgetVar="medicineDlg"
+              modal="true"
+              resizable="false"
+              closable="true"
+              style="width:900px; border-radius:12px;">
+
+        <h:panelGroup id="medicineDialogContent">
+
+            <div style="display:flex; gap:30px; padding:20px;">
+
+                <img src="medicine_images/#{homeBean.selectedMedicine.picture}"
+                     style="width:350px; height:350px; object-fit:contain;" />
+
+                <div style="flex:1;">
+
+                    <h2 style="margin:0;">#{homeBean.selectedMedicine.name}</h2>
+                    <div style="color:gray;">Brand: #{homeBean.selectedMedicine.brand}</div>
+
+                    <div style="font-size:28px; color:#01756e; margin-top:10px;">
+                        ₹#{homeBean.selectedMedicine.price}
+                    </div>
+
+                    <div style="margin-top:10px;">Pack of #{homeBean.selectedMedicine.packOf}</div>
+                    <p style="margin-top:20px;">#{homeBean.selectedMedicine.description}</p>
+
+               <!--<p:commandButton-->  
+<!--    value="Add To Cart"
+    icon="pi pi-shopping-cart"
+    actionListener="#{customerBean.addToCart(homeBean.selectedMedicine.medicineId)}"
+    process="@this"
+    update=":addressInfoForm:selectedAddress :medicineForm"
+    oncomplete="PF('medicineDlg').hide();"
+    style="background:#01756e;color:white;margin-top:20px;" />-->
+<!-- SHOW ADD TO CART IF QUANTITY = 0 -->
+<!-- SHOW ADD TO CART IF QUANTITY = 0 -->
+<!--<h:panelGroup rendered="#{homeBean.selectedMedicine != null and customerBean.quantity(homeBean.selectedMedicine.medicineId) == 0}">-->
+<h:panelGroup 
+    rendered="#{customerBean.showAddButton(homeBean.selectedMedicine.medicineId)}">
+    
+<p:commandButton  
+        value="Add To Cart"
+        icon="pi pi-shopping-cart"
+        actionListener="#{customerBean.addToCart(homeBean.selectedMedicine.medicineId)}"
+        update=":medicineForm"
+        style="background:#01756e;color:white;margin-top:20px;" />
+</h:panelGroup>
+
+<!-- SHOW + / - WHEN IN CART -->
+<!--<h:panelGroup rendered="#{homeBean.selectedMedicine != null and customerBean.quantity(homeBean.selectedMedicine.medicineId) > 0}"-->
+<h:panelGroup 
+    rendered="#{not customerBean.showAddButton(homeBean.selectedMedicine.medicineId)}"
+    style="margin-top:20px; display:flex; gap:10px; align-items:center;">
+
+    <!-- MINUS -->
+    <p:commandButton value="-" 
+                     style="background:#ccc; color:black; width:40px;"
+                     actionListener="#{customerBean.decrease(homeBean.selectedMedicine.medicineId)}"
+                     update=":medicineForm" />
+
+    <!-- QUANTITY -->
+    <span style="font-size:20px; font-weight:bold;">
+        #{customerBean.quantity(homeBean.selectedMedicine.medicineId)}
+    </span>
+
+    <!-- PLUS -->
+    <p:commandButton value="+" 
+                     style="background:#01756e; color:white; width:40px;"
+                     actionListener="#{customerBean.increase(homeBean.selectedMedicine.medicineId)}"
+                     update=":medicineForm" />
+
+</h:panelGroup>
+
+
+                </div>
+
+            </div>
+
+        </h:panelGroup>
+
+    </p:dialog>
+
+</h:form>
+
+<!-- ADD ADDRESS POPUP -->
+<p:dialog header="Add New Address"
+          widgetVar="addressDlg"
+          modal="true"
+          width="400"
+          closable="true">
+
+    <h:form id="addAddressForm">
+
+        <h:panelGrid columns="2" cellpadding="6">
+
+            <h:outputLabel value="Street:" />
+            <p:inputText value="#{customerBean.street}" required="true" />
+
+            <h:outputLabel value="City:" />
+            <p:inputText value="#{customerBean.city}" required="true" />
+
+            <h:outputLabel value="State:" />
+            <p:inputText value="#{customerBean.state}" required="true" />
+
+            <h:outputLabel value="Pincode:" />
+            <p:inputText value="#{customerBean.zip}" required="true" />
+
+        </h:panelGrid>
+
+        <br/>
+
+        <p:commandButton value="Save"
+                         actionListener="#{customerBean.addAddress}"
+                         update=":addressInfoForm:selectedAddress :addAddressForm"
+                         oncomplete="PF('addressDlg').hide()"
+                         style="background:#01756e; color:white;" />
+
+        <p:commandButton value="Cancel"
+                         onclick="PF('addressDlg').hide()"
+                         type="button"
+                         style="margin-left:10px;" />
+
+    </h:form>
+
+</p:dialog>
+
+<p:dialog header="Select Address"
+          widgetVar="selectAddressDlg"
+          modal="true"
+          width="450">
+
+    <h:form id="selectAddressForm">
+        <p:dataTable id="addressTable"
+                     value="#{customerBean.userAddresses}"
+                     var="a"
+                     selectionMode="single"
+                     rowKey="#{a.addressId}"
+                     selection="#{customerBean.selectedAddress}">
+
+            <p:ajax event="rowSelect"
+                    listener="#{customerBean.onAddressSelect}"
+                    update=":addressInfoForm:selectedAddress"
+                    oncomplete="PF('selectAddressDlg').hide()" />
+
+            <p:column headerText="Address">
+                #{a.addressLine}<br/>
+                #{a.city}, #{a.state} - #{a.pincode}
+            </p:column>
+        </p:dataTable>
+    </h:form>
+</p:dialog>
+</h:body>
+</html>
+ 

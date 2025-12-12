@@ -1,0 +1,275 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <title>Admin Profile - Logic Pharmacy</title>
+
+    <style>
+        body {
+            background:#f4f6f9;
+            font-family:Arial;
+            margin:0;
+        }
+
+        .topbar {
+            height:65px;
+            background:white;
+            border-bottom:1px solid #ddd;
+            display:flex;
+            align-items:center;
+            padding-left:260px;
+            font-size:22px;
+            font-weight:bold;
+            color:#01756e;
+            box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .sidebar {
+            width:230px;
+            height:100vh;
+            background:white;
+            position:fixed;
+            top:0;
+            left:0;
+            border-right:1px solid #ddd;
+            padding-top:20px;
+        }
+
+        .sidebar a {
+            display:block;
+            padding:12px 20px;
+            text-decoration:none;
+            color:#01756e;
+            font-size:16px;
+            margin-bottom:5px;
+        }
+        .sidebar a:hover {
+            background:#e6f8f7;
+            border-left:4px solid #01756e;
+        }
+        .sidebar .logout {
+            color:red;
+        }
+
+        .content-area {
+            margin-left:260px;
+            padding:30px;
+        }
+
+        .profile-box {
+            background:white;
+            width:550px;
+            margin:auto;
+            padding:25px;
+            border-radius:12px;
+            box-shadow:0 2px 10px rgba(0,0,0,0.15);
+        }
+
+        h2 {
+            text-align:center;
+            margin-bottom:20px;
+            color:#01756e;
+        }
+
+        table {
+            width:100%;
+            font-size:16px;
+        }
+
+        td {
+            padding:10px 0;
+        }
+
+        .value {
+            color:#444;
+            font-weight:bold;
+        }
+
+        .edit-btn {
+            display:inline-block;
+            padding:8px 14px;
+            background:#01756e;
+            color:white;
+            text-decoration:none;
+            border-radius:6px;
+            font-size:14px;
+        }
+        .edit-btn:hover {
+            background:#02665f;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <a href="Admin.xhtml">🏠 Dashboard</a>
+    <a href="Categories.xhtml">📦 Categories</a>
+    <a href="Manufacturer.xhtml">🏭 Manufacturer</a>
+    <a href="Medicines.xhtml">💊 Medicines</a>
+    <a href="Admin_Profile.xhtml">👥 Users</a>
+    <a href="Orders.xhtml">🛒 Orders</a>
+    <a href="Login.xhtml" class="logout">🚪 Logout</a>
+</div>
+
+<!-- HEADER -->
+<div class="topbar">
+    Coup Admin Dashboard
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content-area">
+
+    <h:form id="profilePanel">
+
+        <div class="profile-box">
+
+            <h2>Admin Profile</h2>
+
+            <table>
+                <tr>
+                    <td><b>Admin ID:</b></td>
+                    <td class="value">#{loginBean.loggedUser.userId}</td>
+                </tr>
+
+                <tr>
+                    <td><b>Username:</b></td>
+                    <td class="value">#{loginBean.loggedUser.username}</td>
+                </tr>
+
+                <tr>
+                    <td><b>Email:</b></td>
+                    <td class="value">#{loginBean.loggedUser.email}</td>
+                </tr>
+
+                <tr>
+                    <td><b>Phone:</b></td>
+                    <td class="value">#{loginBean.loggedUser.phone}</td>
+                </tr>
+
+                <tr>
+                    <td><b>Password:</b></td>
+                    <td class="value">•••••• (hidden)</td>
+                </tr>
+
+                <tr>
+                    <td><b>Role:</b></td>
+                    <td class="value">#{loginBean.loggedUser.roleId.roleName}</td>
+                </tr>
+            </table>
+
+            <br/>
+<!-- Add this near the profile or top bar -->
+<p:commandButton value="Add Another Admin"
+                 actionListener="#{adminBean.openAddAdmin}"
+                 process="@this"
+                 update=":addAdminForm"
+                 oncomplete="PF('addAdminDlg').show()" />
+
+        <p:commandButton value="Edit Profile"
+    actionListener="#{adminBean.loadProfileForEdit}"
+    oncomplete="PF('editDialog').show()"
+    process="@this"
+    update=":editForm" />
+
+            <br/><br/><hr/><br/>
+
+            <!-- LOGOUT -->
+            <h:commandLink action="#{loginBean.logout}" style="color:#c00; font-weight:bold;">
+                <i class="pi pi-sign-out"></i> Logout
+            </h:commandLink>
+
+        </div>
+
+    </h:form>
+
+</div>
+
+<!-- ======================
+     EDIT POPUP DIALOG
+======================= -->
+<!-- ======================
+     EDIT ADMIN POPUP DIALOG
+======================= -->
+<p:dialog id="editDialog" widgetVar="editDialog"
+          header="Update Admin Profile"
+          modal="true" width="500" responsive="true">
+
+    <h:form id="editForm">
+
+        <h:panelGrid columns="2" cellpadding="10" style="width:100%">
+
+            <h:outputLabel value="Username:" />
+            <p:inputText value="#{adminBean.editUsername}" style="width:100%" />
+
+            <h:outputLabel value="Email:" />
+            <p:inputText value="#{adminBean.editEmail}" style="width:100%" />
+
+            <h:outputLabel value="Phone:" />
+            <p:inputText value="#{adminBean.editPhone}" style="width:100%" />
+
+            <h:outputLabel value="Password:" />
+            <p:password value="#{adminBean.editPassword}" style="width:100%" />
+        </h:panelGrid>
+
+        <br/>
+
+     <p:commandButton value="Save"
+    style="background:#01756e;color:white;width:120px;"
+    action="#{adminBean.updateAdminProfile}"
+    process="@form"
+    update="profilePanel"
+    oncomplete="PF('editDialog').hide()" />
+
+        <p:commandButton value="Cancel"
+                         onclick="PF('editDialog').hide()" type="button"
+                         style="margin-left:10px;width:120px;" />
+
+    </h:form>
+
+</p:dialog>
+<p:dialog id="addAdminDlg" widgetVar="addAdminDlg" header="Add Admin" modal="true" width="520">
+    <h:form id="addAdminForm">
+        <h:panelGrid columns="2" cellpadding="8" style="width:100%">
+            <h:outputLabel value="Username:" />
+            <p:inputText value="#{adminBean.newAdminUsername}" required="true"/>
+
+            <h:outputLabel value="Email:" />
+            <p:inputText value="#{adminBean.newAdminEmail}" required="true"/>
+
+            <h:outputLabel value="Phone:" />
+            <p:inputText value="#{adminBean.newAdminPhone}" />
+
+            <h:outputLabel value="Password:" />
+            <p:password value="#{adminBean.newAdminPassword}" required="true"/>
+
+            <h:outputLabel value="Role ID:" />
+            <p:inputText value="#{adminBean.newAdminRoleId}" />
+            <!--
+                You can replace the above Role ID text input with a dropdown:
+                <p:selectOneMenu value="#{adminBean.newAdminRoleId}">
+                    <f:selectItem itemValue="1" itemLabel="Admin (1)" />
+                    <f:selectItem itemValue="2" itemLabel="Customer (2)" />
+                </p:selectOneMenu>
+                Adjust ids/labels to match your Roles table.
+            -->
+        </h:panelGrid>
+
+        <div style="margin-top:12px; text-align:right;">
+            <p:commandButton value="Create" action="#{adminBean.addAnotherAdmin}"
+                             update=":profilePanel, @form" process="@form"
+                             styleClass="p-button-success" oncomplete="PF('addAdminDlg').hide()"/>
+            <p:commandButton value="Cancel" onclick="PF('addAdminDlg').hide()" type="button"/>
+        </div>
+    </h:form>
+</p:dialog>
+
+</h:body>
+</html>

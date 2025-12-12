@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <title>Order Details</title>
+
+    <style>
+        body {
+            background:#f4f6f9;
+            font-family: Arial;
+        }
+
+        .container {
+            width:850px;
+            margin:40px auto;
+            background:white;
+            padding:25px;
+            border-radius:10px;
+            box-shadow:0 2px 12px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color:#01756e;
+            margin-bottom:20px;
+        }
+
+        .section-title {
+            color:#01756e;
+            margin-top:25px;
+            margin-bottom:10px;
+            font-size:20px;
+            border-left:4px solid #01756e;
+            padding-left:10px;
+        }
+
+        .badge {
+            padding:5px 12px;
+            border-radius:6px;
+            color:white;
+            font-weight:bold;
+        }
+
+        .pending { background:#ff9800; }
+        .processing { background:#2196f3; }
+        .shipped { background:#673ab7; }
+        .delivered { background:#4caf50; }
+        .cancelled { background:#f44336; }
+
+        table {
+            width:100%;
+            margin-top:15px;
+            border-collapse:collapse;
+            font-size:15px;
+        }
+
+        th {
+            background:#d5eaff;
+            padding:10px;
+            text-align:left;
+        }
+
+        td {
+            padding:10px;
+            background:white;
+            border-bottom:1px solid #ddd;
+        }
+
+        .back-btn {
+            display:inline-block;
+            padding:8px 15px;
+            background:#01756e;
+            color:white;
+            border-radius:6px;
+            text-decoration:none;
+            margin-bottom:15px;
+        }
+
+        .back-btn:hover {
+            background:#025e57;
+        }
+ </style>
+</h:head>
+
+
+<h:body>
+
+    <div class="container">
+
+        <a href="Orders.xhtml" class="back-btn">&#8592; Back to Orders</a>
+
+        <h1>Order Details</h1>
+
+        <!-- If NOT found -->
+        <h:panelGroup rendered="#{empty orderBean.selectedOrder}">
+            <h3 style="color:red;">Order not found!</h3>
+        </h:panelGroup>
+
+        <!-- If order exists -->
+        <h:panelGroup rendered="#{not empty orderBean.selectedOrder}">
+
+            <!-- ORDER BASIC INFO -->
+            <div>
+                <p><b>Order ID:</b> #{orderBean.selectedOrder.orderId}</p>
+                <p><b>Date:</b> #{orderBean.selectedOrder.orderDate}</p>
+
+                <p>
+                    <b>Status:</b>
+                <!-- UPDATE STATUS SECTION -->
+<h3 class="section-title">Update Order Status</h3>
+
+<h:form>
+    <h:panelGroup style="margin-top:10px;">
+
+        <h:selectOneMenu value="#{orderBean.selectedOrder.status}"
+                         style="padding:6px; width:200px;">
+            <f:selectItem itemValue="Pending" itemLabel="Pending" />
+            <f:selectItem itemValue="Processing" itemLabel="Processing" />
+            <f:selectItem itemValue="Packed" itemLabel="Packed" />
+            <f:selectItem itemValue="Shipped" itemLabel="Shipped" />
+            <f:selectItem itemValue="Delivered" itemLabel="Delivered" />
+            <f:selectItem itemValue="Cancelled" itemLabel="Cancelled" />
+        </h:selectOneMenu>
+
+        <h:commandButton value="Update Status"
+                         action="#{orderBean.updateStatus}"
+                         style="margin-left:10px; 
+                                padding:7px 14px; 
+                                background:#01756e; 
+                                color:white; 
+                                border-radius:6px;" />
+
+    </h:panelGroup>
+
+    <h:messages style="color:green; margin-top:10px;" />
+</h:form>
+
+                </p>
+
+                <p><b>Total Amount:</b> ₹#{orderBean.selectedOrder.totalAmount}</p>
+                <p><b>Payment Method:</b> #{orderBean.selectedOrder.paymentMethod}</p>
+                
+                
+                
+<!-- DOWNLOAD RECEIPT BUTTON -->
+<p:commandButton value="Download Receipt"
+                 icon="pi pi-download"
+                 ajax="false"
+                 style="background:#01756e; color:white; margin-top:10px; border-radius:6px;"
+                 onclick="window.location.href='ReceiptServlet?orderId=#{orderBean.selectedOrder.orderId}'"/>
+            </div>
+
+            <!-- ADDRESS SECTION -->
+            <h3 class="section-title">Shipping Address</h3>
+
+            <p>
+                #{orderBean.selectedOrder.addressId.addressLine}<br/>
+                #{orderBean.selectedOrder.addressId.city},
+                #{orderBean.selectedOrder.addressId.state} - #{orderBean.selectedOrder.addressId.pincode}
+            </p>
+
+            <!-- ITEMS TABLE -->
+            <h3 class="section-title">Order Items</h3>
+
+            <table>
+                <tr>
+                    <th>Medicine</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                </tr>
+
+                <ui:repeat value="#{orderBean.selectedOrder.orderItemsCollection}" var="i">
+                    <tr>
+                        <td>#{i.medicineId.name}</td>
+                        <td>#{i.quantity}</td>
+                        <td>₹#{i.price}</td>
+                        <td>₹#{i.price * i.quantity}</td>
+                    </tr>
+                </ui:repeat>
+            </table>
+
+        </h:panelGroup>
+<!-- ASSIGN DELIVERY PARTNER -->
+<h3 class="section-title">Assign Delivery Partner</h3>
+
+<h:form id="assignForm">
+
+    <h:panelGroup>
+
+        <p><b>Delivery Address:</b> 
+            #{orderBean.selectedOrder.addressId.addressLine},
+            #{orderBean.selectedOrder.addressId.city},
+            #{orderBean.selectedOrder.addressId.state} - 
+            #{orderBean.selectedOrder.addressId.pincode}
+        </p>
+
+        <br/>
+
+        <!-- Partner Dropdown -->
+        <h:selectOneMenu value="#{orderBean.selectedPartnerId}"
+                         style="padding:6px; width:260px;">
+            <f:selectItem itemLabel="-- Select Delivery Partner --" itemValue="" />
+
+            <!-- Load all partners -->
+            <f:selectItems value="#{deliveryBean.allPartners}"
+                           var="dp"
+                           itemValue="#{dp.deliveryPartnerId}"
+                           itemLabel="#{dp.vehicleNo} — #{dp.userId != null ? dp.userId.username : 'UNASSIGNED'}" />
+        </h:selectOneMenu>
+
+        <br/><br/>
+
+        <!-- Assign Button -->
+        <h:commandButton value="Assign Partner"
+                         action="#{orderBean.assignDeliveryPartner}"
+                         style="padding:7px 14px; 
+                                background:#673ab7; 
+                                color:white; 
+                                border-radius:6px;" />
+
+    </h:panelGroup>
+
+</h:form>
+
+<hr/>
+
+    </div>
+
+</h:body>
+</html>

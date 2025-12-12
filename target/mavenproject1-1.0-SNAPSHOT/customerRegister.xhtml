@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core">
+
+<h:head>
+    <title>Customer Registration – Logic Pharmacy</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f6fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .reg-container {
+            background: white;
+            padding: 30px 40px;
+            width: 420px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .field {
+            margin-bottom: 12px;
+        }
+
+        label {
+            font-size: 15px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        input, .ui-inputfield {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            transition: 0.3s;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #3498db;
+        }
+
+        .btn-row {
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .link {
+            display: block;
+            text-align: center;
+            margin-top: 12px;
+            color: #3498db;
+            text-decoration: none;
+            font-size: 15px;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: red;
+            display: block;
+            text-align: center;
+            margin-top: 12px;
+        }
+    </style>
+</h:head>
+
+
+<h:body>
+
+    <div class="reg-container">
+
+        <h:form prependId="false">
+
+            <h2>Create Customer Account</h2>
+
+            <h:messages globalOnly="true" style="color:red;" />
+
+            <!-- Username -->
+            <div class="field">
+                <label>Username</label>
+                <h:inputText value="#{customerBean.username}" required="true"
+                             requiredMessage="Username is required" />
+            </div>
+
+            <!-- Email -->
+            <div class="field">
+                <label>Email</label>
+                <h:inputText value="#{customerBean.email}" required="true"
+                             requiredMessage="Email is required" />
+            </div>
+
+            <!-- Phone -->
+            <div class="field">
+                <label>Phone</label>
+                <h:inputText value="#{customerBean.phone}" required="true"
+                             requiredMessage="Phone is required" />
+            </div>
+
+            <!-- Password -->
+            <div class="field">
+                <label>Password</label>
+                <h:inputSecret value="#{customerBean.password}" required="true"
+                               requiredMessage="Password is required" />
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="field">
+                <label>Confirm Password</label>
+                <h:inputSecret value="#{customerBean.confirmPassword}" required="true"
+                               requiredMessage="Confirm your password" />
+            </div>
+
+            <div class="btn-row">
+                <h:commandButton value="Register" action="#{customerBean.register}" styleClass="btn" />
+            </div>
+
+            <a href="Login.xhtml" class="link">Already have an account? Login</a>
+
+        </h:form>
+
+    </div>
+
+</h:body>
+</html>

@@ -1,0 +1,164 @@
+<!--<?xml version='1.0' encoding='UTF-8' ?>-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Delivery Dashboard</title>
+
+    <link rel="stylesheet" 
+          href="https://unpkg.com/primeflex@3.3.1/primeflex.css" />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/primeicons/6.0.1/primeicons.min.css" />
+
+    <style>
+        body {
+            margin: 0;
+            background: #eef3fb;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        .topbar {
+            height: 65px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 20px;
+            font-weight: bold;
+            color: #444;
+        }
+
+        .sidebar {
+            width: 230px;
+            min-height: 100vh;
+            background: #fff;
+            border-right: 1px solid #ccc;
+            padding-top: 15px;
+            position: fixed;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            color: #01756e;
+            font-size: 16px;
+            text-decoration: none;
+            margin-bottom: 5px;
+        }
+
+        .sidebar a:hover {
+            background: #e6f8f7;
+            border-left: 4px solid #01756e;
+        }
+
+        .logout {
+            color: red !important;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .status-btn {
+            padding: 5px 10px;
+            color: white;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .proc { background: #2196f3; }
+        .outd { background: #673ab7; }
+        .delv { background: #4caf50; }
+    </style>
+
+</h:head>
+
+<h:body>
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+        Delivery Dashboard
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+        <a href="delivery.xhtml">
+            <i class="pi pi-home mr-2"></i> Dashboard
+        </a>
+
+        <a href="Delivery_profile.xhtml">
+            <i class="pi pi-shopping-bag mr-2"></i> Profile
+        </a>
+
+        <a href="Logout.xhtml" class="logout">
+            <i class="pi pi-power-off mr-2"></i> Logout
+        </a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="content">
+
+        <h2>Orders Assigned to You</h2>
+
+        <h:form id="deliveryForm">
+<p:dataTable value="#{deliveryBean.assignedOrders}" var="o"
+             paginator="true" rows="10" style="width:100%;">
+
+    <p:column headerText="Delivery ID">
+        #{o.deliveryId}
+    </p:column>
+
+    <p:column headerText="Order ID">
+        #{o.orderId.orderId}
+    </p:column>
+
+    <p:column headerText="Customer">
+        #{o.orderId.userId.username}
+    </p:column>
+
+    <p:column headerText="Amount">
+        ₹#{o.orderId.totalAmount}
+    </p:column>
+
+    <p:column headerText="Address">
+        #{o.orderId.addressId.addressLine} <br/>
+        #{o.orderId.addressId.city}, #{o.orderId.addressId.state} <br/>
+        <small>#{o.orderId.addressId.pincode}</small>
+    </p:column>
+
+    <p:column headerText="Status">
+        #{o.status}
+    </p:column>
+
+    <p:column headerText="Action">
+
+        <!-- VIEW -->
+        <p:commandButton value="View"
+            onclick="window.location.href='OrderDetails.xhtml?orderId=#{o.orderId.orderId}'; return false;"
+            styleClass="p-button-sm p-button-outlined" />
+
+        <!-- ADVANCE STATUS -->
+        <p:commandButton value="Next Stage"
+                         actionListener="#{deliveryBean.advanceStatus(o.deliveryId)}"
+                         update="@form"
+                         styleClass="p-button-sm p-button-success ml-2" />
+
+    </p:column>
+
+</p:dataTable>
+
+        </h:form>
+
+    </div>
+
+</h:body>
+</html>
+

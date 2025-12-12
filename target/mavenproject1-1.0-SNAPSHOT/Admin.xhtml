@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Coup Admin Dashboard</title>
+
+    <style>
+        body {
+            background: #f4f6f9;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        /* HEADER BAR */
+        .topbar {
+            height: 65px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding-left: 260px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #01756e;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 230px;
+            height: 100vh;
+            background: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            border-right: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #01756e;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar a:hover {
+            background: #e6f8f7;
+            border-left: 4px solid #01756e;
+        }
+
+        .sidebar .logout {
+            color: red;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            margin-left: 250px;
+            padding: 20px;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+<f:metadata>
+    <f:event type="preRenderView" listener="#{loginBean.verifyAdminAccess}" />
+</f:metadata>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <a href="Admin.xhtml">🏠 Dashboard</a>
+    <a href="Categories.xhtml">📦 Categories</a>
+    <a href="Manufacturer.xhtml">🏭 Manufacturer</a>
+    <a href="Medicines.xhtml">💊 Medicines</a>
+    <a href="Admin_Profile.xhtml">👥 Users</a>
+    <a href="Orders.xhtml">🛒 Orders</a>
+        <a href="Offers.xhtml">🛒 Offers</a>
+
+    <a href="Login.xhtml" class="logout">🚪 Logout</a>
+</div>
+
+<!-- HEADER BAR -->
+<div class="topbar">
+    Coup Admin Dashboard
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content-area">
+
+    <h:form>
+
+        <p:dataTable value="#{adminBean.usersList}" var="u"
+                     paginator="true" rows="10"
+                     style="width: 95%;" >
+
+            <p:column headerText="ID">
+                <h:outputText value="#{u.userId}" />
+            </p:column>
+
+            <p:column headerText="Username">
+                <h:outputText value="#{u.username}" />
+            </p:column>
+
+            <p:column headerText="Email">
+                <h:outputText value="#{u.email}" />
+            </p:column>
+
+            <p:column headerText="Phone">
+                <h:outputText value="#{u.phone}" />
+            </p:column>
+
+            <p:column headerText="Password">
+                <h:outputText value="#{u.password}" />
+            </p:column>
+
+            <p:column headerText="Role">
+                <h:outputText value="#{u.roleId.roleName}" />
+            </p:column>
+
+        </p:dataTable>
+
+    </h:form>
+
+</div>
+
+</h:body>
+</html>

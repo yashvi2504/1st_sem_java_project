@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Manage Offers</title>
+
+    <style>
+        body {
+            background: #f4f6f9;
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        /* HEADER BAR */
+        .topbar {
+            height: 65px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            padding-left: 260px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #01756e;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 230px;
+            height: 100vh;
+            background: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            border-right: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #01756e;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar a:hover {
+            background: #e6f8f7;
+            border-left: 4px solid #01756e;
+        }
+
+        .sidebar .logout {
+            color: red;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .form-title {
+            font-size: 22px;
+            color: #01756e;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            width: 500px;
+        }
+
+        .table-panel {
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+<!-- OPTIONAL ACCESS CHECK -->
+<f:metadata>
+    <f:event type="preRenderView" listener="#{loginBean.verifyAdminAccess}" />
+</f:metadata>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <a href="Admin.xhtml">🏠 Dashboard</a>
+    <a href="Categories.xhtml">📦 Categories</a>
+    <a href="Manufacturer.xhtml">🏭 Manufacturer</a>
+    <a href="Medicines.xhtml">💊 Medicines</a>
+    <a href="Admin_Profile.xhtml">👥 Users</a>
+    <a href="Orders.xhtml">🛒 Orders</a>
+    <a href="Offers.xhtml">🎁 Offers</a>
+    <a href="Login.xhtml" class="logout">🚪 Logout</a>
+</div>
+
+<!-- HEADER BAR -->
+<div class="topbar">
+    Manage Offers
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content-area">
+
+    <!-- FORM PANEL -->
+    <div class="panel">
+
+        <div class="form-title">Create / Update Offer</div>
+
+        <h:form>
+
+            <h:panelGrid columns="2" cellpadding="8">
+
+                <h:outputLabel value="Offer Title:" />
+                <h:inputText value="#{offerBean.offer.offerTitle}" required="true" />
+
+                <h:outputLabel value="Description:" />
+                <h:inputTextarea value="#{offerBean.offer.offerDescription}" rows="3" cols="25" />
+
+                <h:outputLabel value="Discount Type:" />
+                <h:selectOneMenu value="#{offerBean.offer.discountType}">
+                    <f:selectItem itemValue="PERCENT" itemLabel="Percent (%)" />
+                    <f:selectItem itemValue="FIXED" itemLabel="Fixed Amount" />
+                </h:selectOneMenu>
+
+                <h:outputLabel value="Discount Value:" />
+                <h:inputText value="#{offerBean.offer.discountValue}" required="true" />
+
+                <h:outputLabel value="Min Order Amount:" />
+                <h:inputText value="#{offerBean.offer.minOrderAmount}" />
+
+                <h:outputLabel value="Start Date:" />
+                <p:datePicker value="#{offerBean.offer.startDate}" pattern="yyyy-MM-dd" />
+
+                <h:outputLabel value="End Date:" />
+                <p:datePicker value="#{offerBean.offer.endDate}" pattern="yyyy-MM-dd" />
+
+                <h:outputLabel value="Active:" />
+                <h:selectBooleanCheckbox value="#{offerBean.offer.active}" />
+
+                <h:outputLabel value="Apply to Medicine:" />
+                <h:selectOneMenu value="#{offerBean.medicineId}">
+                    <f:selectItem itemValue="0" itemLabel="-- All Medicines --" />
+                    <f:selectItems value="#{offerBean.medicineList}"
+                                   var="m"
+                                   itemValue="#{m.medicineId}"
+                                   itemLabel="#{m.name}" />
+                </h:selectOneMenu>
+
+            </h:panelGrid>
+
+            <br/>
+
+            <h:commandButton value="Save Offer"
+                             action="#{offerBean.saveOffer}"
+                             style="background:#01756e; color:white; padding:8px 18px; border-radius:5px; border:none;" />
+
+        </h:form>
+
+    </div>
+
+    <!-- OFFERS TABLE PANEL -->
+    <div class="table-panel">
+
+        <h2 style="color:#01756e;">All Offers</h2>
+
+        <h:form id="offersForm">
+            <p:dataTable value="#{offerBean.offerList}" var="o"
+                         paginator="true" rows="10"
+                         style="width:100%;">
+
+                <p:column headerText="ID">
+                    <h:outputText value="#{o.offerId}" />
+                </p:column>
+
+                <p:column headerText="Title">
+                    <h:outputText value="#{o.offerTitle}" />
+                </p:column>
+
+                <p:column headerText="Type">
+                    <h:outputText value="#{o.discountType}" />
+                </p:column>
+
+                <p:column headerText="discount_Value">
+                    <h:outputText value="#{o.discountValue}" />
+                </p:column>
+
+                <p:column headerText="Active">
+                    <h:outputText value="#{o.active ? 'Yes' : 'No'}" />
+                </p:column>
+
+                <p:column headerText="Start">
+                    <h:outputText value="#{o.startDate}" />
+                </p:column>
+
+                <p:column headerText="End">
+                    <h:outputText value="#{o.endDate}" />
+                </p:column>
+
+                <p:column headerText="Actions">
+
+            <p:commandButton value="Edit"
+                 action="#{offerBean.loadForEdit(o)}"
+                 update=":editForm"
+                 oncomplete="PF('editDlg').show()"
+                 process="@this"
+                 style="background:#ffc107; border:none; padding:5px;" />
+
+                    <!-- DELETE BUTTON -->
+                    <p:commandButton value="Delete"
+                                     action="#{offerBean.deleteOffer(o.offerId)}"
+                                     update="@form"
+                                     style="background:#dc3545; color:white; border:none; padding:5px; margin-left:5px;" />
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+
+    </div>
+<!-- UPDATE OFFER DIALOG -->
+<p:dialog id="editDialog" header="Edit Offer" modal="true" widgetVar="editDlg"
+          resizable="false" width="520">
+
+    <h:form id="editForm">
+
+        <h:panelGrid columns="2" cellpadding="8">
+
+            <h:outputLabel value="Offer Title:" />
+            <h:inputText value="#{offerBean.offer.offerTitle}" required="true" />
+
+            <h:outputLabel value="Description:" />
+            <h:inputTextarea value="#{offerBean.offer.offerDescription}" rows="3" cols="25" />
+
+            <h:outputLabel value="Discount Type:" />
+            <h:selectOneMenu value="#{offerBean.offer.discountType}">
+                <f:selectItem itemValue="PERCENT" itemLabel="Percent (%)" />
+                <f:selectItem itemValue="FIXED" itemLabel="Fixed Amount" />
+            </h:selectOneMenu>
+
+            <h:outputLabel value="Value:" />
+            <h:inputText value="#{offerBean.offer.discountValue}" />
+
+            <h:outputLabel value="Min Order Amount:" />
+            <h:inputText value="#{offerBean.offer.minOrderAmount}" />
+
+            <h:outputLabel value="Start:" />
+            <p:datePicker value="#{offerBean.offer.startDate}" pattern="yyyy-MM-dd" />
+
+            <h:outputLabel value="End:" />
+            <p:datePicker value="#{offerBean.offer.endDate}" pattern="yyyy-MM-dd" />
+
+            <h:outputLabel value="Active:" />
+            <h:selectBooleanCheckbox value="#{offerBean.offer.active}" />
+
+            <!-- Add medicine selector if you want it editable in dialog -->
+            <h:outputLabel value="Apply to Medicine:" />
+            <h:selectOneMenu value="#{offerBean.medicineId}">
+                <f:selectItem itemValue="0" itemLabel="-- All Medicines --" />
+                <f:selectItems value="#{offerBean.medicineList}"
+                               var="m"
+                               itemValue="#{m.medicineId}"
+                               itemLabel="#{m.name}" />
+            </h:selectOneMenu>
+
+        </h:panelGrid>
+
+        <br/>
+
+        <p:commandButton value="Update Offer"
+                         action="#{offerBean.updateOffer}"
+                         oncomplete="PF('editDlg').hide()"
+                         update=":offersForm"        
+                         process="@form"
+                         style="background:#28a745; color:white; padding:6px 16px; border:none;" />
+
+        <p:commandButton value="Cancel"
+                         onclick="PF('editDlg').hide()"
+                         type="button"
+                         style="margin-left:10px; background:#6c757d; color:white; padding:6px 16px; border:none;" />
+
+    </h:form>
+
+</p:dialog>
+
+</div>
+
+</h:body>
+</html>
