@@ -1,6 +1,8 @@
 
+
 package ejb;
 
+import entity.Prescription;
 import entity.*;
 import jakarta.annotation.security.PermitAll;
 import jakarta.ejb.Stateless;
@@ -311,14 +313,24 @@ public String removeCartItem(Integer userId, Integer cartItemId) {
             em.remove(a);
         }
     }
-
-    @Override
-    public List<Addresses> getAddressesByUserId(Integer userId) {
-        TypedQuery<Addresses> q = em.createNamedQuery("Addresses.findAll", Addresses.class);
-        List<Addresses> all = q.getResultList();
-        all.removeIf(addr -> !addr.getUserId().getUserId().equals(userId));
-        return all;
+// CORRECTED and more EFFICIENT Code
+@Override
+public List<Addresses> getAddressesByUserId(Integer userId) {
+    // We use a JPQL query that directly filters by the user's ID in the database.
+    // This ensures only valid addresses linked to the user are returned,
+    // avoiding the need to iterate through ALL addresses and perform a crash-prone check.
+    try {
+        TypedQuery<Addresses> q = em.createQuery(
+            "SELECT a FROM Addresses a WHERE a.userId.userId = :userId", Addresses.class);
+        q.setParameter("userId", userId);
+        return q.getResultList();
+        
+    } catch (Exception e) {
+        // Log the error if the query fails for some reason
+        e.printStackTrace();
+        return new ArrayList<>();
     }
+}
 // ===================== ORDER MANAGEMENT =====================
 
 @Override

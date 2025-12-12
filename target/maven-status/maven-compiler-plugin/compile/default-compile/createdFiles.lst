@@ -47,6 +47,7 @@ entity\Invoices.class
 entity\DeliveryPartners.class
 auth\SecureAuthentication.class
 ejb\DeliveryEJBLocal.class
+validators\ConfirmPasswordValidator.class
 ejb\DeliveryEJB.class
 beans\deliveryBean.class
 ejb\OfferEJBLocal.class

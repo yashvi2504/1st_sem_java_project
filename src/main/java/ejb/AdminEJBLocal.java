@@ -32,6 +32,9 @@ List<Categories> searchCategoriesByName(String name);
     void updateManufacturer(Integer manufacturerId, String name, String contactInfo);
     void deleteManufacturer(Integer manufacturerId);
     List<Manufacturers> getAllManufacturers();
+    
+    List<Manufacturers> searchManufacturersByName(String name);
+
     Users getUserByEmail(String email);
 
     

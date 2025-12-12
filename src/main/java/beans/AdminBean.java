@@ -113,7 +113,7 @@ String uploadPath = FacesContext.getCurrentInstance()
         .getRealPath("/medicine_images/");
 
  private final String ABSOLUTE_UPLOAD_PATH =
-            "D:/java/mavenproject1/src/main/webapp/medicine_images/";
+            "D:/java/yasi/src/main/webapp/medicine_images/";
 
 private String uploadedFileName;   // NEW
 //private Part picturePart;
@@ -352,13 +352,23 @@ public void setManufacturerSearchKeyword(String manufacturerSearchKeyword) {
     this.manufacturerSearchKeyword = manufacturerSearchKeyword;
 }
 
-
+public void searchManufacturers() {
+    if (manufacturerSearchKeyword != null && !manufacturerSearchKeyword.trim().isEmpty()) {
+        manufacturersList = adminEJB.searchManufacturersByName(manufacturerSearchKeyword.trim());
+        showMessage(manufacturersList.size() + " result(s) found.");
+    } else {
+        manufacturersList = adminEJB.getAllManufacturers();
+        showMessage("Showing all manufacturers.");
+    }
+}
 
 public void clearManufacturerSearch() {
     manufacturerSearchKeyword = null;
     manufacturersList = adminEJB.getAllManufacturers();
     showMessage("Search cleared.");
 }
+
+
 
 public void openNewMedicine() {
     selectedMedicine = new Medicines();

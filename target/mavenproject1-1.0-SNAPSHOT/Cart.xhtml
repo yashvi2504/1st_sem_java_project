@@ -25,46 +25,57 @@
                      style="width:95%; margin:auto;">
 
             <p:column headerText="Medicine">
-                #{ci.medicineId.name}
+                <h:panelGroup rendered="#{ci.medicineId != null}">
+                    #{ci.medicineId.name}
+                </h:panelGroup>
+                <h:panelGroup rendered="#{ci.medicineId == null}">
+                    <span style="color:red;">Error: Missing Item</span>
+                </h:panelGroup>
             </p:column>
 
             <p:column headerText="Qty">
-                <div style="display:flex; align-items:center; gap:10px;">
+                <h:panelGroup rendered="#{ci.medicineId != null}">
+                    <div style="display:flex; align-items:center; gap:10px;">
 
-                    <p:commandButton value="-" 
-                                     style="background:#ccc; color:black; width:35px;"
-                                     actionListener="#{customerBean.decrease(ci.medicineId.medicineId)}" update="@form" />
+                        <p:commandButton value="-" 
+                                         style="background:#ccc; color:black; width:35px;"
+                                         actionListener="#{customerBean.decrease(ci.medicineId.medicineId)}" update="@form" />
 
-                    <span style="font-size:18px; font-weight:bold;">
-                        #{customerBean.quantity(ci.medicineId.medicineId)} </span>
+                        <span style="font-size:18px; font-weight:bold;">
+                            #{customerBean.quantity(ci.medicineId.medicineId)} </span>
 
-                    <p:commandButton value="+" 
-                                     style="background:#01756e; color:white; width:35px;"
-                                     actionListener="#{customerBean.increase(ci.medicineId.medicineId)}" update="@form" />
+                        <p:commandButton value="+" 
+                                         style="background:#01756e; color:white; width:35px;"
+                                         actionListener="#{customerBean.increase(ci.medicineId.medicineId)}" update="@form" />
 
-                </div>
+                    </div>
+                </h:panelGroup>
             </p:column>
 
 
-          <p:column headerText="Line Total">
-    ₹#{(ci.pricePerUnit * ci.quantity)}
-</p:column>
+            <p:column headerText="Line Total">
+                <h:panelGroup rendered="#{ci.medicineId != null}">
+                    ₹#{(ci.pricePerUnit * ci.quantity)}
+                </h:panelGroup>
+            </p:column>
 
             <p:column headerText="Prescription">
+                <h:panelGroup rendered="#{ci.medicineId != null}">
 
-                <h:panelGroup rendered="#{ci.medicineId.prescriptionRequired}">
-                    <span style="color:red;">Required</span><br/>
+                    <h:panelGroup rendered="#{ci.medicineId.prescriptionRequired}">
+                        <span style="color:red;">Required</span><br/>
 
-                    <p:commandButton value="Upload"
-                                     action="#{cartBean.preparePrescriptionUpload(ci.medicineId.medicineId)}"
-                                     update=":prescForm"
-                                     oncomplete="PF('prescDialogVar').show();" />
+                        <p:commandButton value="Upload"
+                                         action="#{cartBean.preparePrescriptionUpload(ci.medicineId.medicineId)}"
+                                         update=":prescForm"
+                                         oncomplete="PF('prescDialogVar').show();" />
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{!ci.medicineId.prescriptionRequired}">
+                        <span style="color:green;">Not Required</span>
+                    </h:panelGroup>
+
                 </h:panelGroup>
-
-                <h:panelGroup rendered="#{!ci.medicineId.prescriptionRequired}">
-                    <span style="color:green;">Not Required</span>
-                </h:panelGroup>
-
             </p:column>
 
             <p:column headerText="Actions">

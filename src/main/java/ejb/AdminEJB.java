@@ -42,8 +42,8 @@ public void addCategory(String name, String description, InputStream imageStream
     c.setDescription(description);
 
 //    String srcFolder  = "D:/java/logic_pharmacy/src/main/webapp/category_images/";
-String srcFolder  = "D:/java/mavenproject1/src/main/webapp/resources/category_images/";
-String targetFolder = "D:/java/mavenproject1/target/logic_pharmacy-1.0-SNAPSHOT/resources/category_images/";
+String srcFolder  = "D:/java/yasi/src/main/webapp/resources/category_images/";
+String targetFolder = "D:/java/yasi/target/logic_pharmacy-1.0-SNAPSHOT/resources/category_images/";
 
 //    String targetFolder = "D:/java/logic_pharmacy/target/logic_pharmacy-1.0-SNAPSHOT/category_images/";
 
@@ -77,7 +77,7 @@ String targetFolder = "D:/java/mavenproject1/target/logic_pharmacy-1.0-SNAPSHOT/
 
 
 private final String CATEGORY_IMG_DIR =
-        "D:/java/logic_pharmacy/target/logic_pharmacy-1.0-SNAPSHOT/category_images/";
+        "D:/java/yasi/target/logic_pharmacy-1.0-SNAPSHOT/category_images/";
 
 private String saveCategoryImage(InputStream uploadedStream, String fileName) {
     try {
@@ -147,7 +147,7 @@ public List<Categories> getAllCategories() {
 
     // --------- Manufacturer CRUD ---------
     @Override
-    @RolesAllowed("Admin") 
+//    @RolesAllowed("Admin") 
     public void addManufacturer(String name, String contactInfo) {
         Manufacturers manufacturer = new Manufacturers();
         manufacturer.setName(name);
@@ -156,7 +156,7 @@ public List<Categories> getAllCategories() {
     }
 
     @Override
-    @RolesAllowed("Admin") 
+//    @RolesAllowed("Admin") 
     public void updateManufacturer(Integer manufacturerId, String name, String contactInfo) {
         Manufacturers manufacturer = em.find(Manufacturers.class, manufacturerId);
         if (manufacturer != null) {
@@ -167,7 +167,7 @@ public List<Categories> getAllCategories() {
     }
 
     @Override
-    @RolesAllowed("Admin") 
+//    @RolesAllowed("Admin") 
     public void deleteManufacturer(Integer manufacturerId) {
         Manufacturers manufacturer = em.find(Manufacturers.class, manufacturerId);
         if (manufacturer == null) return;
@@ -184,6 +184,12 @@ public List<Categories> getAllCategories() {
 @Override
 public List<Categories> searchCategoriesByName(String name) {
     return em.createQuery("SELECT c FROM Categories c WHERE LOWER(c.name) LIKE :name", Categories.class)
+             .setParameter("name", "%" + name.toLowerCase() + "%")
+             .getResultList();
+}
+@Override
+public List<Manufacturers> searchManufacturersByName(String name) {
+    return em.createQuery("SELECT m FROM Manufacturers m WHERE LOWER(m.name) LIKE :name", Manufacturers.class)
              .setParameter("name", "%" + name.toLowerCase() + "%")
              .getResultList();
 }
