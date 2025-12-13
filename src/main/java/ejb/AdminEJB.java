@@ -72,9 +72,24 @@ String targetFolder = "D:/java/yasi/target/logic_pharmacy-1.0-SNAPSHOT/resources
 
     em.persist(c);
 }
+public List<Object[]> getLowStockMedicines() {
+    return em.createQuery(
+        "SELECT m.name, m.stock FROM Medicines m WHERE m.stock < 3",
+        Object[].class
+    ).getResultList();
+}
 
 
 
+    @Override
+    public List<Object[]> getOrderCountPerDay() {
+        return em.createQuery(
+            "SELECT FUNCTION('DAYNAME', o.orderDate), COUNT(o) " +
+            "FROM Orders o " +
+            "GROUP BY FUNCTION('DAYNAME', o.orderDate)",
+            Object[].class
+        ).getResultList();
+    }
 
 private final String CATEGORY_IMG_DIR =
         "D:/java/yasi/target/logic_pharmacy-1.0-SNAPSHOT/category_images/";

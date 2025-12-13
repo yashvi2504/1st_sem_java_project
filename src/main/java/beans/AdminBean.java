@@ -126,6 +126,30 @@ public void init() {
     manufacturersList = adminEJB.getAllManufacturers();
     medicinesList = (List<Medicines>) adminEJB.getAllMedicines(); 
     loadMedicines();
+      loadLowStockMedicines();
+}
+public void loadLowStockMedicines() {
+
+    List<Object[]> list = adminEJB.getLowStockMedicines();
+
+    if (list == null || list.isEmpty()) {
+        lowStockAvailable = false;
+        return;
+    }
+
+    StringBuilder sb = new StringBuilder("⚠ LOW STOCK ALERT ⚠  ");
+
+    for (Object[] row : list) {
+        String name = (String) row[0];
+        Integer stock = (Integer) row[1];
+        sb.append(name)
+          .append(" (")
+          .append(stock)
+          .append(" left) | ");
+    }
+
+    lowStockMessage = sb.toString();
+    lowStockAvailable = true;
 }
 
     // ---------------- Users ----------------

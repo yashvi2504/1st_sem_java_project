@@ -18,6 +18,10 @@ public interface AdminEJBLocal {
             // AdminEJBLocal.java (add this method declaration)
 void addUser(String username, String email, String phone, String password, Integer roleId);
 
+    // Dashboard chart
+    List<Object[]> getOrderCountPerDay();
+    List<Object[]> getLowStockMedicines();
+
 //    void addCategory(String name, String description);
 //         void addCategory(String name, String description, InputStream imageStream, String fileName);
 //   void addCategory(String name, String description);
