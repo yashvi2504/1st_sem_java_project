@@ -3,6 +3,7 @@ package beans;
 import ejb.CustomerEJBLocal;
 import ejb.DeliveryEJBLocal;
 import entity.Orders;
+import entity.Prescription;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.view.ViewScoped;
@@ -23,6 +24,7 @@ public class OrderBean implements Serializable {
     private LoginBean loginBean;
 @Inject
 DeliveryEJBLocal deliveryEJB;
+private List<Prescription> prescriptions;
 
     private List<Orders> orderList;  // All orders
     private Orders selectedOrder;    // Single order details
@@ -53,6 +55,9 @@ public void init() {
         if (orderIdParam != null) {
             Integer orderId = Integer.valueOf(orderIdParam);
             selectedOrder = customerEJB.getOrderById(orderId);
+            
+    prescriptions = customerEJB.getPrescriptionsByUser(selectedOrder.getUserId().getUserId());
+
         }
 
     } catch (Exception e) {
@@ -61,6 +66,22 @@ public void init() {
 }
 
     
+public Prescription getPrescription(Integer medicineId) {
+    return prescriptions.stream()
+            .filter(p -> p.getMedicineId().getMedicineId().equals(medicineId))
+            .findFirst()
+            .orElse(null);
+}
+
+public void approvePrescription(Integer medicineId) {
+    customerEJB.updatePrescriptionStatus(selectedOrder.getUserId().getUserId(), medicineId, "APPROVED");
+    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Prescription Approved"));
+}
+
+public void rejectPrescription(Integer medicineId) {
+    customerEJB.updatePrescriptionStatus(selectedOrder.getUserId().getUserId(), medicineId, "REJECTED");
+    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Prescription Rejected"));
+}
     
     public void updateStatus() {
     try {

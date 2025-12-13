@@ -20,6 +20,7 @@ beans\OrderBean.class
 ejb\SecureBean.class
 entity\Roles.class
 rest\AuthREST$UserLogin.class
+servlets\PrescriptionServlet.class
 entity\CartItems.class
 beans\HelloBean.class
 ejb\AdminEJBLocal.class

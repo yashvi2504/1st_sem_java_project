@@ -173,14 +173,76 @@
                     <th>Subtotal</th>
                 </tr>
 
-                <ui:repeat value="#{orderBean.selectedOrder.orderItemsCollection}" var="i">
-                    <tr>
-                        <td>#{i.medicineId.name}</td>
-                        <td>#{i.quantity}</td>
-                        <td>₹#{i.price}</td>
-                        <td>₹#{i.price * i.quantity}</td>
-                    </tr>
-                </ui:repeat>
+             <ui:repeat value="#{orderBean.selectedOrder.orderItemsCollection}" var="i">
+    <tr>
+        <td>#{i.medicineId.name}</td>
+        <td>#{i.quantity}</td>
+        <td>₹#{i.price}</td>
+        <td>₹#{i.price * i.quantity}</td>
+
+        <!-- PRESCRIPTION STATUS COLUMN -->
+        <td>
+
+            <!-- 1️⃣ If medicine does NOT require prescription -->
+            <h:panelGroup rendered="#{!i.medicineId.prescriptionRequired}">
+                <span style="color:green; font-weight:bold;">Not Required</span>
+            </h:panelGroup>
+
+            <!-- 2️⃣ If prescription required -->
+            <h:panelGroup rendered="#{i.medicineId.prescriptionRequired}">
+                
+                <!-- Fetch prescription -->
+                <ui:fragment rendered="#{orderBean.getPrescription(i.medicineId.medicineId) == null}">
+                    <span style="color:red; font-weight:bold;">Not Uploaded</span>
+                </ui:fragment>
+
+                <ui:fragment rendered="#{orderBean.getPrescription(i.medicineId.medicineId) != null}">
+
+                    <!-- Show FILE LINK -->
+                  <a href="PrescriptionServlet?file=#{orderBean.getPrescription(i.medicineId.medicineId).filePath}"
+   target="_blank">
+    View File
+</a>
+
+
+                    <br/>
+
+                    <!-- Show STATUS BADGE -->
+                    <h:panelGroup rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status == 'PENDING'}">
+                        <span class="badge pending">Pending</span>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status == 'APPROVED'}">
+                        <span class="badge delivered">Approved</span>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status == 'REJECTED'}">
+                        <span class="badge cancelled">Rejected</span>
+                    </h:panelGroup>
+
+                    <br/><br/>
+
+                    <!-- Approve / Reject Buttons -->
+                    <h:form>
+
+                        <h:commandButton value="Approve"
+                                         action="#{orderBean.approvePrescription(i.medicineId.medicineId)}"
+                                         rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'PENDING'}"
+                                         style="background:#4caf50; color:white; padding:5px 12px; border-radius:5px;" />
+
+                        <h:commandButton value="Reject"
+                                         action="#{orderBean.rejectPrescription(i.medicineId.medicineId)}"
+                                         rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'PENDING'}"
+                                         style="background:#f44336; color:white; padding:5px 12px; border-radius:5px; margin-left:10px;" />
+
+                    </h:form>
+                </ui:fragment>
+
+            </h:panelGroup>
+        </td>
+    </tr>
+</ui:repeat>
+
             </table>
 
         </h:panelGroup>

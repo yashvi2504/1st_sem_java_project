@@ -9,6 +9,7 @@ import entity.Offers;
 import entity.Orders;
 import entity.DeliveryTracking; 
 import entity.Manufacturers;
+import entity.Prescription;
 import jakarta.ejb.Local;
 import java.util.Collection;
 import java.util.List;
@@ -55,5 +56,7 @@ String registerCustomer(String username, String email, String phone, String pass
     void increaseCartItemQuantity(int userId, int medicineId);
     void decreaseCartItemQuantity(int userId, int medicineId);
 
-    
+ List<Prescription> getPrescriptionsByUser(Integer userId);
+void updatePrescriptionStatus(Integer userId, Integer medicineId, String newStatus);
+   
 }

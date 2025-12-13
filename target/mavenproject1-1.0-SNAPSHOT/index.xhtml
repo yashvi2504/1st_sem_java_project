@@ -29,7 +29,22 @@
 
 <!-- HEADER -->
 <div class="header">
-    
+    <!-- ================= SEARCH BAR ================= -->
+<div style="display:flex; justify-content:center; margin-top:30px; margin-bottom:20px;">
+    <h:form id="searchForm" style="display:flex; gap:10px;">
+        
+        <p:inputText id="searchBox"
+                     value="#{homeBean.searchText}"
+                     placeholder="Search medicines..."
+                     style="width:350px; padding:10px; border-radius:8px;" />
+
+        <p:commandButton value="Search"
+                         icon="pi pi-search"
+                         actionListener="#{homeBean.searchMedicines}"
+                         update=":medicineGrid"
+                         style="background:#01756e; color:white;" />
+    </h:form>
+</div>
     <div class="flex justify-content-between align-items-center">
 
         <!-- LEFT -->
@@ -114,6 +129,7 @@
 
 <!-- ================= BEST SELLING ================= -->
 <h2 style="margin-left: 50px; font-size: 28px; font-weight: 600;">Latest Medicines</h2>
+<h:panelGroup id="medicineGrid">
 
 <!-- GRID: 4 MEDICINES PER ROW -->
 <div style="
@@ -147,10 +163,10 @@
             <div style="font-size:13px;">Pack of #{m.packOf}</div>
 
         </div>
-
+        
     </ui:repeat>
-
 </div>
+</h:panelGroup>
 
 
 <h:form id="medicineForm">

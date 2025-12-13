@@ -168,10 +168,8 @@
             <br/><br/>
 
             <p:commandButton value="Upload"
-                             actionListener="#{cartBean.uploadPrescription}"
-                             ajax="false"
-                             update=":mainForm :mainForm:msgs"
-                             oncomplete="PF('prescDialogVar').hide();" />
+                             action="#{cartBean.uploadPrescription}"
+                             ajax="false"/>
 
         </h:form>
     </p:dialog>

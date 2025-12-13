@@ -683,5 +683,29 @@ public void decreaseCartItemQuantity(int userId, int medicineId) {
     recalcAndMergeCartTotal(cart);
 }
 
+@Override
+public List<Prescription> getPrescriptionsByUser(Integer userId) {
+    return em.createQuery("SELECT p FROM Prescription p WHERE p.userId.userId = :uid", Prescription.class)
+             .setParameter("uid", userId)
+             .getResultList();
+}
+
+@Override
+public void updatePrescriptionStatus(Integer userId, Integer medicineId, String newStatus) {
+
+    Prescription p = em.createQuery(
+        "SELECT p FROM Prescription p WHERE p.userId.userId = :uid AND p.medicineId.medicineId = :mid",
+        Prescription.class)
+        .setParameter("uid", userId)
+        .setParameter("mid", medicineId)
+        .getResultStream()
+        .findFirst()
+        .orElse(null);
+
+    if (p != null) {
+        p.setStatus(newStatus);
+        em.merge(p);
+    }
+}
 
 }

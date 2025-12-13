@@ -62,8 +62,10 @@ public void uploadPrescription() {
             addMessage("Please choose a file!");
             return;
         }
+System.out.println("Uploaded file = " + uploadedPrescription);
 
-      String folder = "D:/java/yashi_pro_copy/src/main/webapp/prescriptions/";
+//      String folder = "D:/java/yashi_pro_copy/src/main/webapp/prescriptions/";\String folder = "D:/pharmacy_uploads/prescriptions/";
+String folder = "D:/java/yasi/prescriptions/";
 
         File dir = new File(folder);
         if (!dir.exists()) dir.mkdirs();
@@ -85,7 +87,7 @@ public void uploadPrescription() {
         customerEJB.savePrescription(
             loginBean.getLoggedUser().getUserId(),
             uploadMedicineId,
-            "/prescriptions/" + fileName,
+            fileName,
             uploadedPrescription.getContentType()
         );
 
