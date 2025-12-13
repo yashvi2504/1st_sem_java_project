@@ -3,6 +3,7 @@ package ejb;
 import entity.Categories;
 import entity.Manufacturers;
 import entity.Medicines;
+import entity.Orders;
 import entity.Users;
 import jakarta.ejb.Local;
 import java.io.InputStream;
@@ -17,6 +18,10 @@ public interface AdminEJBLocal {
             List<Users> getAllUsers();
             // AdminEJBLocal.java (add this method declaration)
 void addUser(String username, String email, String phone, String password, Integer roleId);
+List<Orders> getAllOrders();
+
+    BigDecimal getWeeklyIncome();   // ✅ THIS LINE IS REQUIRED
+List<Object[]> getMostSoldMedicine();
 
     // Dashboard chart
     List<Object[]> getOrderCountPerDay();

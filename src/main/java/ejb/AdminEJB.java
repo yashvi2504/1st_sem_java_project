@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -466,6 +467,42 @@ public void addUser(String username, String email, String phone, String password
 @Override
 public Users getUserById(Integer userId) {
     return em.find(Users.class, userId);
+}
+
+    @Override
+    public List<Orders> getAllOrders() {
+         return em.createQuery("SELECT o FROM Orders o", Orders.class)
+             .getResultList();    }
+@Override
+public BigDecimal getWeeklyIncome() {
+    Calendar cal = Calendar.getInstance();
+    cal.add(Calendar.DAY_OF_MONTH, -7);
+    Date fromDate = cal.getTime();
+
+    return em.createQuery(
+        "SELECT COALESCE(SUM(o.totalAmount), 0) " +
+        "FROM Orders o WHERE o.orderDate >= :fromDate",
+        BigDecimal.class
+    )
+    .setParameter("fromDate", fromDate)
+    .getSingleResult();
+}
+@Override
+public List<Object[]> getMostSoldMedicine() {
+    return em.createQuery(
+        "SELECT m.name, SUM(oi.quantity) " +
+        "FROM OrderItems oi " +
+        "JOIN oi.medicineId m " +
+        "JOIN oi.orderId o " +
+        "WHERE o.orderDate >= :fromDate " +
+        "GROUP BY m.name " +
+        "ORDER BY SUM(oi.quantity) DESC",
+        Object[].class
+    )
+    .setParameter("fromDate", 
+        java.sql.Date.valueOf(java.time.LocalDate.now().minusDays(7)))
+    .setMaxResults(1)   // ⭐ MOST SOLD ONLY
+    .getResultList();
 }
 
 

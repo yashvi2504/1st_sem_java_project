@@ -35,6 +35,7 @@ entity\Offers.class
 rest\DeliveryREST.class
 ejb\OfferEJB.class
 entity\Users.class
+servlets\WeeklyReportServlet.class
 com\mycompany\mavenproject1\JakartaRestConfiguration.class
 rest\ApplicationConfig.class
 jwtrest\Constants.class

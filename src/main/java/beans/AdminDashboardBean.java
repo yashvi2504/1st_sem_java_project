@@ -64,4 +64,4 @@ public class AdminDashboardBean implements Serializable {
     public BarChartModel getOrdersChart() {
         return ordersChart;
     }
-}
+}   
