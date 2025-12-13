@@ -11,6 +11,9 @@ public class Prescription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "prescription_id")
     private Integer prescriptionId;
+@ManyToOne
+@JoinColumn(name = "order_id")
+private Orders orderId;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -50,6 +53,13 @@ public class Prescription {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+public Orders getOrderId() {
+    return orderId;
+}
+
+public void setOrderId(Orders orderId) {
+    this.orderId = orderId;
+}
 
     public Date getUploadedAt() { return uploadedAt; }
     public void setUploadedAt(Date uploadedAt) { this.uploadedAt = uploadedAt; }

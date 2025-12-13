@@ -1,3 +1,4 @@
+
 package beans;
 
 import ejb.CustomerEJBLocal;

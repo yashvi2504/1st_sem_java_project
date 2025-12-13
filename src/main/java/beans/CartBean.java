@@ -1,4 +1,5 @@
 
+
 package beans;
 
 import ejb.CustomerEJBLocal;
@@ -270,4 +271,3 @@ public double getDiscountedTotal() {
 }
 
 }
-
