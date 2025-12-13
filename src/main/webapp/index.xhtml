@@ -128,15 +128,17 @@
 
 
 <!-- ================= BEST SELLING ================= -->
-<h2 style="margin-left: 50px; font-size: 28px; font-weight: 600;">Latest Medicines</h2>
+<h2 style="margin-left: 50px; font-size: 28px; font-weight: 600;">
+    Latest Medicines
+</h2>
+
 <h:panelGroup id="medicineGrid">
 
-<!-- GRID: 4 MEDICINES PER ROW -->
 <div style="
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 25px;
-    padding: 20px 40px;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:25px;
+    padding:20px 40px;
 ">
 
     <ui:repeat value="#{homeBean.medicines}" var="m">
@@ -150,20 +152,46 @@
                            oncomplete="PF('medicineDlg').show();">
 
                 <img src="medicine_images/#{m.picture}"
-                     style="width:160px; height:160px; object-fit:contain;" />
+                     style="
+                        width:160px;
+                        height:160px;
+                        object-fit:contain;
+                        #{m.stock le 0 ? 'filter:grayscale(100%);opacity:0.6;' : ''}
+                     " />
             </p:commandLink>
 
-            <div style="font-size:17px; font-weight:600;">#{m.name}</div>
-            <div style="font-size:14px; color:gray;">#{m.brand}</div>
+            <div style="font-weight:600;">#{m.name}</div>
+            <div style="color:gray;">#{m.brand}</div>
+            <div style="color:#01756e; font-size:18px;">₹#{m.price}</div>
+            <div>Pack of #{m.packOf}</div>
 
-            <div style="margin-top:8px; font-size:18px; color:#01756e;">
-                ₹#{m.price}
-            </div>
+            <!-- OUT OF STOCK -->
+            <h:panelGroup rendered="#{m.stock le 0}">
+                <div style="
+                    margin-top:8px;
+                    background:#f44336;
+                    color:white;
+                    padding:6px;
+                    border-radius:6px;
+                    font-weight:bold;
+                ">
+                    ❌ OUT OF STOCK
+                </div>
+            </h:panelGroup>
 
-            <div style="font-size:13px;">Pack of #{m.packOf}</div>
+            <!-- IN STOCK -->
+            <h:panelGroup rendered="#{m.stock gt 0}">
+                <div style="
+                    margin-top:6px;
+                    color:#2e7d32;
+                    font-weight:600;
+                ">
+                    <!--✔ In stock (#{m.stock})-->
+                </div>
+            </h:panelGroup>
 
         </div>
-        
+
     </ui:repeat>
 </div>
 </h:panelGroup>
