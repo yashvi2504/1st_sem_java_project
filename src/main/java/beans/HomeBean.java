@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import java.util.ArrayList;
 import java.util.List;
 
 @Named("homeBean")
@@ -18,17 +19,23 @@ public class HomeBean {
 
     private List<Categories> categories;
     private List<Medicines> medicines;
+//private List<Medicines> medicines;
+private Integer selectedCategoryId;
 
-    @PostConstruct
-    public void init() {
-        categories = adminEJB.getAllCategories();
-         medicines = (List<Medicines>) adminEJB.getAllMedicines();
-    }
+@PostConstruct
+public void init() {
+    categories = adminEJB.getAllCategories();
+  
+    medicines = new ArrayList<>(adminEJB.getAllMedicines());
+}
 
     public List<Categories> getCategories() {
         return categories;
     }
-    
+    public void filterByCategory(Integer categoryId) {
+    medicines = new ArrayList<>(adminEJB.getMedicinesByCategory(categoryId));
+}
+
     
   public List<Medicines> getMedicines() {
     if (filteredMedicines != null) {

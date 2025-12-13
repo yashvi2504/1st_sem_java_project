@@ -353,13 +353,16 @@ public Collection<Medicines> getMedicineByName(String name) {
                                         .getResultList();
     return medicines;
 }
-@Override@RolesAllowed("Admin") 
-public Collection<Medicines> getMedicinesByCategory(Integer categoryId) {
-    Collection<Medicines> medicines = em.createNamedQuery("Medicines.findByCategory")
-                                        .setParameter("categoryId", categoryId)
-                                        .getResultList();
-    return medicines;
+@Override
+public List<Medicines> getMedicinesByCategory(Integer categoryId) {
+    return em.createQuery(
+        "SELECT m FROM Medicines m WHERE m.categoryId.categoryId = :cid",
+        Medicines.class
+    )
+    .setParameter("cid", categoryId)
+    .getResultList();
 }
+
 @Override
 @RolesAllowed("Admin") 
 public Collection<Medicines> getMedicinesByManufacturer(Integer manufacturerId) {

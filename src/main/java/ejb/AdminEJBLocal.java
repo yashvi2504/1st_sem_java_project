@@ -63,7 +63,7 @@ Medicines getMedicineById(Integer medicineId);
 Collection<Medicines> getAllMedicines();
 
   Collection<Medicines> getMedicineByName(String name);
-Collection<Medicines> getMedicinesByCategory(Integer categoryId);
+  Collection<Medicines> getMedicinesByCategory(Integer categoryId);
 Collection<Medicines> getMedicinesByManufacturer(Integer manufacturerId);
 void updateMedicineStock(Integer medicineId, int newStock);
 Collection<Medicines> getLowStockMedicines(int threshold);//all medicines whose stock < n
