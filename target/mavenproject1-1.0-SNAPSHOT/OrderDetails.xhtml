@@ -225,10 +225,12 @@
                     <!-- Approve / Reject Buttons -->
                     <h:form>
 
-                        <h:commandButton value="Approve"
-                                         action="#{orderBean.approvePrescription(i.medicineId.medicineId)}"
-                                         rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'PENDING'}"
-                                         style="background:#4caf50; color:white; padding:5px 12px; border-radius:5px;" />
+                        <p:commandButton value="Approve"
+                 action="#{orderBean.approvePrescription(i.medicineId.medicineId)}"
+                 update="@form"
+                 oncomplete="PF('statusDlg').show()"
+                 rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'PENDING'}"
+                 style="background:#4caf50;color:white;" />
 
                         <h:commandButton value="Reject"
                                          action="#{orderBean.rejectPrescription(i.medicineId.medicineId)}"
@@ -291,6 +293,24 @@
 <hr/>
 
     </div>
+<p:dialog header="Prescription Status"
+          widgetVar="statusDlg"
+          modal="true"
+          closable="true"
+          width="450"
+          height="200"
+          showEffect="fade"
+          rendered="#{orderBean.showPopup}">
+
+    <h:panelGroup style="text-align:center; font-size:18px;">
+        <h:outputText value="#{orderBean.popupMessage}" />
+        <br/><br/>
+        <p:commandButton value="OK"
+                         onclick="PF('statusDlg').hide()"
+                         style="background:#01756e;color:white;" />
+    </h:panelGroup>
+
+</p:dialog>
 
 </h:body>
 </html>

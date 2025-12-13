@@ -489,35 +489,67 @@ public Orders getOrderById(Integer orderId) {
         return null;
     }
 }
-
 @Override
 public void updateOrderStatus(Integer orderId, String newStatus) {
 
     Orders order = em.find(Orders.class, orderId);
-
     if (order == null) return;
 
-    // ⭐ If order is Packed or Shipped → reduce stock
-    if (newStatus.equalsIgnoreCase("Packed") ||
-        newStatus.equalsIgnoreCase("Shipped")) {
+    // 🔒 BLOCK order if prescription not approved
+    if (newStatus.equalsIgnoreCase("Packed")
+            || newStatus.equalsIgnoreCase("Shipped")
+            || newStatus.equalsIgnoreCase("Delivered")) {
 
         for (OrderItems item : order.getOrderItemsCollection()) {
 
             Medicines med = item.getMedicineId();
 
-            // reduce stock
+            if (Boolean.TRUE.equals(med.getPrescriptionRequired())) {
+
+                Prescription p = em.createQuery(
+                        "SELECT p FROM Prescription p " +
+                        "WHERE p.userId.userId = :uid " +
+                        "AND p.medicineId.medicineId = :mid",
+                        Prescription.class)
+                        .setParameter("uid", order.getUserId().getUserId())
+                        .setParameter("mid", med.getMedicineId())
+                        .getResultStream()
+                        .findFirst()
+                        .orElse(null);
+
+                if (p == null) {
+                    throw new RuntimeException(
+                        "Prescription not uploaded for medicine: " + med.getName()
+                    );
+                }
+
+                if (!"APPROVED".equalsIgnoreCase(p.getStatus())) {
+                    throw new RuntimeException(
+                        "Prescription not approved for medicine: " + med.getName()
+                    );
+                }
+            }
+        }
+    }
+
+    // 📦 Reduce stock only AFTER validation
+    if (newStatus.equalsIgnoreCase("Packed")
+            || newStatus.equalsIgnoreCase("Shipped")) {
+
+        for (OrderItems item : order.getOrderItemsCollection()) {
+            Medicines med = item.getMedicineId();
             int updatedStock = med.getStock() - item.getQuantity();
             if (updatedStock < 0) updatedStock = 0;
-
             med.setStock(updatedStock);
             em.merge(med);
         }
     }
 
-    // ⭐ Update status normally
+    // ✅ Update order status
     order.setStatus(newStatus);
     em.merge(order);
 }
+
 @Override
 public List<Orders> getAllOrders() {
     return em.createQuery("SELECT o FROM Orders o ORDER BY o.orderId DESC", Orders.class)

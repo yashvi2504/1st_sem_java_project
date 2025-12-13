@@ -72,17 +72,50 @@ public Prescription getPrescription(Integer medicineId) {
             .findFirst()
             .orElse(null);
 }
+private String popupMessage;
+private boolean showPopup;
+
+public String getPopupMessage() {
+    return popupMessage;
+}
+
+public boolean isShowPopup() {
+    return showPopup;
+}
 
 public void approvePrescription(Integer medicineId) {
-    customerEJB.updatePrescriptionStatus(selectedOrder.getUserId().getUserId(), medicineId, "APPROVED");
-    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Prescription Approved"));
+
+    customerEJB.updatePrescriptionStatus(
+        selectedOrder.getUserId().getUserId(),
+        medicineId,
+        "APPROVED"
+    );
+
+    // 🔴 REQUIRED: reload prescriptions so UI updates
+    prescriptions = customerEJB.getPrescriptionsByUser(
+        selectedOrder.getUserId().getUserId()
+    );
+
+    popupMessage = "✅ Prescription Approved Successfully!";
+    showPopup = true;
+}
+public void rejectPrescription(Integer medicineId) {
+
+    customerEJB.updatePrescriptionStatus(
+        selectedOrder.getUserId().getUserId(),
+        medicineId,
+        "REJECTED"
+    );
+
+    // 🔴 REQUIRED
+    prescriptions = customerEJB.getPrescriptionsByUser(
+        selectedOrder.getUserId().getUserId()
+    );
+
+    popupMessage = "❌ Prescription Rejected!";
+    showPopup = true;
 }
 
-public void rejectPrescription(Integer medicineId) {
-    customerEJB.updatePrescriptionStatus(selectedOrder.getUserId().getUserId(), medicineId, "REJECTED");
-    FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Prescription Rejected"));
-}
-    
     public void updateStatus() {
     try {
         if (selectedOrder != null) {
