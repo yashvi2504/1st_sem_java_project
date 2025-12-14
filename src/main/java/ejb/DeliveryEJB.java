@@ -62,21 +62,31 @@ public class DeliveryEJB implements DeliveryEJBLocal {
     }
 
     // 3️⃣ Update delivery status
-    @Override
-    public void updateDeliveryStatus(Integer deliveryId, String status) {
-        Delivery delivery = em.find(Delivery.class, deliveryId);
-        if (delivery != null) {
-            delivery.setStatus(status);
-            em.merge(delivery);
+  
+@Override
+public void updateDeliveryStatus(Integer deliveryId, String status) {
 
-            // Add tracking entry
-            DeliveryTracking tracking = new DeliveryTracking();
-            tracking.setDeliveryId(delivery);
-            tracking.setStatus(status);
-            tracking.setUpdateTime(new Date());
-            em.persist(tracking);
-        }
+    Delivery delivery = em.find(Delivery.class, deliveryId);
+    if (delivery == null) return;
+
+    // 1️⃣ Update DELIVERY
+    delivery.setStatus(status);
+    em.merge(delivery);
+
+    // 2️⃣ Update ORDER (THIS WAS MISSING)
+    Orders order = delivery.getOrderId();
+    if (order != null) {
+        order.setStatus(status);
+        em.merge(order);
     }
+
+    // 3️⃣ Insert TRACKING
+    DeliveryTracking tracking = new DeliveryTracking();
+    tracking.setDeliveryId(delivery);
+    tracking.setStatus(status);
+    tracking.setUpdateTime(new Date());
+    em.persist(tracking);
+}
 
     // 4️⃣ Get deliveries
     @Override
