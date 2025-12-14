@@ -6,6 +6,7 @@ import ejb.CustomerEJBLocal;
 import entity.Cart;
 import entity.CartItems;
 import entity.Offers;
+import entity.Orders;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
@@ -40,6 +41,7 @@ public class CartBean implements Serializable {
     private List<CartItems> cartItems;
 private Offers appliedOffer;
 private double discountedTotal;
+private Integer lastPlacedOrderId;
 
     // ⭐ NEW FIELD — stores user selection (COD / Online)
     private String paymentMethod;
@@ -57,60 +59,81 @@ private Integer uploadMedicineId;
 public UploadedFile getUploadedPrescription() { return uploadedPrescription; }
 public void setUploadedPrescription(UploadedFile uploadedPrescription) { this.uploadedPrescription = uploadedPrescription; }
 public void preparePrescriptionUpload(Integer medicineId) {
+    if (medicineId == null) {
+        addMessage("Invalid medicine selected!");
+        return;
+    }
     this.uploadMedicineId = medicineId;
-}public void uploadPrescription() {
-
+}
+public void uploadPrescription() {
     try {
-        if (uploadedPrescription == null) {
-            addMessage("Please choose a file!");
+        if (uploadMedicineId == null) {
+            addMessage("Medicine not selected!");
             return;
         }
 
-        // ✅ FINAL STORAGE LOCATION
-        String folderPath = "D:/java/yasi/prescriptions/";
-
-        File folder = new File(folderPath);
-        if (!folder.exists()) {
-            folder.mkdirs();
+        if (uploadedPrescription == null) {
+            addMessage("Please choose a prescription file!");
+            return;
         }
 
-        // ✅ Safe filename
-        String fileName = System.currentTimeMillis() + "_" +
-                          uploadedPrescription.getFileName();
+        String folderPath = "D:/java/yasi/prescriptions/";
+        File folder = new File(folderPath);
+        if (!folder.exists()) folder.mkdirs();
 
-        File targetFile = new File(folder, fileName);
+        String fileName = System.currentTimeMillis() + "_"
+                + uploadedPrescription.getFileName();
+
+        File target = new File(folder, fileName);
 
         try (InputStream in = uploadedPrescription.getInputStream();
-             FileOutputStream out = new FileOutputStream(targetFile)) {
+             FileOutputStream out = new FileOutputStream(target)) {
 
             byte[] buffer = new byte[1024];
-            int bytesRead;
-
-            while ((bytesRead = in.read(buffer)) != -1) {
-                out.write(buffer, 0, bytesRead);
+            int len;
+            while ((len = in.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
             }
         }
 
-        // ✅ SAVE ONLY FILE NAME IN DB
         customerEJB.savePrescription(
-            loginBean.getLoggedUser().getUserId(),
-                null,
-            uploadMedicineId,
-            fileName,
-            uploadedPrescription.getContentType()
+                loginBean.getLoggedUser().getUserId(),
+                null,                 // ✅ orderId NOT needed now
+                uploadMedicineId,
+                fileName,
+                uploadedPrescription.getContentType()
         );
 
         addMessage("Prescription uploaded successfully!");
 
     } catch (Exception e) {
         e.printStackTrace();
-        addMessage("Upload failed: " + e.getMessage());
+        addMessage("Upload failed!");
     }
 }
 
 private void addMessage(String msg) {
     FacesMessage m = new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null);
     FacesContext.getCurrentInstance().addMessage(null, m);
+}
+public Integer getLastPlacedOrderId() {
+    return lastPlacedOrderId;
+}
+public boolean isPrescriptionRequiredButNotUploaded() {
+
+    if (cartItems == null) return false;
+
+    for (CartItems ci : cartItems) {
+        if (ci.getMedicineId() != null &&
+            Boolean.TRUE.equals(ci.getMedicineId().getPrescriptionRequired())) {
+
+            // if order not placed OR prescription not uploaded
+            if (lastPlacedOrderId == null) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 public void loadCart() {
@@ -193,45 +216,41 @@ private void applyBestOffer() {
         if (loginBean.getLoggedUser() == null) return;
         customerEJB.removeCartItem(loginBean.getLoggedUser().getUserId(), cartItemId);
         loadCart();
-    }
-
-public void confirmOrder() {
-
+    }public void confirmOrder() {
     try {
-        if (customerBean.getSelectedAddress() == null) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_WARN,
-                    "Please add a delivery address!", null));
+        for (CartItems ci : cartItems) {
+            if (ci.getMedicineId() != null &&
+                Boolean.TRUE.equals(ci.getMedicineId().getPrescriptionRequired())) {
 
-            PrimeFaces.current().ajax().addCallbackParam("showAddressDialog", true);
-            return;
-        }
+                boolean uploaded = customerEJB
+                        .hasPrescription(loginBean.getLoggedUser().getUserId(),
+                                          ci.getMedicineId().getMedicineId());
 
-        if (paymentMethod == null || paymentMethod.isEmpty()) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Please select a payment method!", null));
-            return;
+                if (!uploaded) {
+                    FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Prescription required. Please upload prescription before placing order.", null));
+                    return;
+                }
+            }
         }
 
         Integer userId = loginBean.getLoggedUser().getUserId();
         Integer addressId = customerBean.getSelectedAddress().getAddressId();
+        Integer offerId = appliedOffer != null ? appliedOffer.getOfferId() : null;
 
-        // ⭐ PASS OFFER ID IF AVAILABLE
-        Integer offerId = (appliedOffer != null) ? appliedOffer.getOfferId() : null;
+        Orders order = customerEJB.placeOrderFromCart(
+                userId, addressId, paymentMethod, offerId
+        );
 
-        customerEJB.placeOrderFromCart(userId, addressId, paymentMethod, offerId);
+        lastPlacedOrderId = order.getOrderId();
 
         loadCart();
 
-        FacesContext.getCurrentInstance().addMessage(null,
-            new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Order Placed Successfully!", null));
+        addMessage("Order placed successfully!");
 
     } catch (Exception e) {
-        FacesContext.getCurrentInstance().addMessage(null,
-            new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                "Order Failed: " + e.getMessage(), null));
+        addMessage("Order failed: " + e.getMessage());
     }
 }
 
@@ -278,6 +297,21 @@ public Offers getAppliedOffer() {
 
 public double getDiscountedTotal() {
     return discountedTotal;
+}public void increase(Integer medicineId) {
+    if (medicineId == null) return;
+    customerEJB.increaseCartItemQuantity(
+        loginBean.getLoggedUser().getUserId(), medicineId
+    );
+    loadCart();
 }
+
+public void decrease(Integer medicineId) {
+    if (medicineId == null) return;
+    customerEJB.decreaseCartItemQuantity(
+        loginBean.getLoggedUser().getUserId(), medicineId
+    );
+    loadCart();
+}
+
 
 }

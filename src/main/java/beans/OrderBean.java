@@ -93,13 +93,22 @@ public void setSelectedStatus(String selectedStatus) {
     this.selectedStatus = selectedStatus;
 }
 
-
 public Prescription getPrescription(Integer medicineId) {
+
+    if (prescriptions == null || medicineId == null) {
+        return null;
+    }
+
     return prescriptions.stream()
-            .filter(p -> p.getMedicineId().getMedicineId().equals(medicineId))
-            .findFirst()
-            .orElse(null);
+        .filter(p ->
+            p.getMedicineId() != null &&              // ✅ NULL SAFE
+            p.getMedicineId().getMedicineId() != null &&
+            p.getMedicineId().getMedicineId().equals(medicineId)
+        )
+        .findFirst()
+        .orElse(null);
 }
+
 private String popupMessage;
 private boolean showPopup;
 

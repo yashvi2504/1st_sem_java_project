@@ -363,23 +363,32 @@ public Orders placeOrderFromCart(Integer userId, Integer shippingAddressId, Stri
     BigDecimal total = BigDecimal.ZERO;
 
     List<OrderItems> orderItemsList = new ArrayList<>();
+//BigDecimal total = BigDecimal.ZERO;
 
-    // 3️⃣ Convert cart items → order items
-    for (CartItems ci : cart.getCartItemsCollection()) {
+for (CartItems ci : cart.getCartItemsCollection()) {
 
-        OrderItems oi = new OrderItems();
-        oi.setOrderId(order);
-        oi.setMedicineId(ci.getMedicineId());
-        oi.setQuantity(ci.getQuantity());
-
-        BigDecimal price = BigDecimal.valueOf(ci.getPricePerUnit() * ci.getQuantity());
-        oi.setPrice(price);
-
-        total = total.add(price);
-
-        em.persist(oi);
-        orderItemsList.add(oi);
+    if (ci.getMedicineId() == null) {
+        throw new RuntimeException(
+            "Cart contains invalid item. Please remove and re-add the medicine."
+        );
     }
+
+    OrderItems oi = new OrderItems();
+    oi.setOrderId(order);
+    oi.setMedicineId(ci.getMedicineId());
+    oi.setQuantity(ci.getQuantity());
+
+    BigDecimal price = BigDecimal.valueOf(
+        (ci.getPricePerUnit() != null ? ci.getPricePerUnit() : 0.0)
+        * ci.getQuantity()
+    );
+
+    oi.setPrice(price);
+    total = total.add(price);   // ⭐ IMPORTANT LINE
+
+    em.persist(oi);
+    orderItemsList.add(oi);
+}
 
     // ⭐ If an offer is applied, reduce total
     if (order.getOfferId() != null) {
@@ -501,6 +510,7 @@ public Orders getOrderById(Integer orderId) {
         return null;
     }
 }
+
 @Override
 public void updateOrderStatus(Integer orderId, String newStatus) {
 
@@ -749,6 +759,35 @@ public void updatePrescriptionStatus(Integer userId, Integer medicineId, String 
         p.setStatus(newStatus);
         em.merge(p);
     }
+}
+
+    @Override
+public boolean hasPrescription(Integer userId, Integer medicineId) {
+
+    if (userId == null || medicineId == null) {
+        return false;
+    }
+
+    return em.createQuery(
+            "SELECT p FROM Prescription p " +
+            "WHERE p.userId.userId = :uid " +
+            "AND p.medicineId.medicineId = :mid",
+            Prescription.class)
+        .setParameter("uid", userId)
+        .setParameter("mid", medicineId)
+        .getResultStream()
+        .findFirst()
+        .isPresent();
+}
+
+@Override
+public List<Prescription> getPrescriptionsByOrder(Integer orderId) {
+    return em.createQuery(
+        "SELECT p FROM Prescription p WHERE p.orderId.orderId = :oid",
+        Prescription.class
+    )
+    .setParameter("oid", orderId)
+    .getResultList();
 }
 
 }

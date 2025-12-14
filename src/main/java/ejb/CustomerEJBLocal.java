@@ -58,5 +58,7 @@ String registerCustomer(String username, String email, String phone, String pass
 
  List<Prescription> getPrescriptionsByUser(Integer userId);
 void updatePrescriptionStatus(Integer userId, Integer medicineId, String newStatus);
-   
+  boolean hasPrescription(Integer userId, Integer medicineId);
+  List<Prescription> getPrescriptionsByOrder(Integer orderId);
+
 }

@@ -154,19 +154,17 @@
                 <br/>
 
                 <!-- QUANTITY -->
-                <div class="qty-box">
-                    <p:commandButton value="−"
-                                     styleClass="qty-btn"
-                                     actionListener="#{customerBean.decrease(ci.medicineId.medicineId)}"
-                                     update="@form"/>
+            <p:commandButton value="−"
+    action="#{cartBean.decrease(ci.medicineId.medicineId)}"
+    rendered="#{ci.medicineId != null}"
+    update="@form"/>
 
-                    <span>#{customerBean.quantity(ci.medicineId.medicineId)}</span>
+<span>#{ci.quantity}</span>
 
-                    <p:commandButton value="+"
-                                     styleClass="qty-btn"
-                                     actionListener="#{customerBean.increase(ci.medicineId.medicineId)}"
-                                     update="@form"/>
-                </div>
+<p:commandButton value="+"
+    action="#{cartBean.increase(ci.medicineId.medicineId)}"
+    rendered="#{ci.medicineId != null}"
+    update="@form"/>
 
                 <br/><br/>
 
@@ -176,23 +174,19 @@
                                    actionListener="#{cartBean.remove(ci.cartItemId)}"
                                    update="@form"/>
                 </div>
-                <!-- PRESCRIPTION HANDLING -->
+<!-- PRESCRIPTION HANDLING -->
 <h:panelGroup rendered="#{ci.medicineId.prescriptionRequired}">
-
-    <!-- Badge -->
     <span class="prescription-badge prescription-required">
         Prescription Required
     </span>
-    <br/>
 
-    <!-- Upload button -->
+    <br/><br/>
+
     <p:commandButton value="Upload Prescription"
                      icon="pi pi-upload"
-                     style="margin-top:8px; background:#ff9800; color:white;"
-                     actionListener="#{cartBean.preparePrescriptionUpload(ci.medicineId.medicineId)}"
+                     action="#{cartBean.preparePrescriptionUpload(ci.medicineId.medicineId)}"
                      oncomplete="PF('prescDialogVar').show()"
-                     process="@this"
-                     update=":prescForm" />
+                     update=":prescForm"/>
 </h:panelGroup>
 
 <!-- WHEN NOT REQUIRED -->
@@ -201,6 +195,7 @@
         No Prescription Needed
     </span>
 </h:panelGroup>
+
 
             </div>
 
@@ -288,25 +283,27 @@
         </h:form>
     </p:dialog>
 
+<p:dialog id="prescDialog"
+          header="Upload Prescription"
+          widgetVar="prescDialogVar"
+          modal="true"
+          width="400">
 
-    <p:dialog id="prescDialog" header="Upload Prescription"
-              widgetVar="prescDialogVar" modal="true" width="400">
+    <h:form id="prescForm" enctype="multipart/form-data">
 
-        <h:form id="prescForm" enctype="multipart/form-data">
+        <p:fileUpload mode="simple"
+                      value="#{cartBean.uploadedPrescription}"
+                      allowTypes="/(\.|\/)(png|jpg|jpeg|pdf)$/"
+                      label="Choose File" />
 
-            <p:fileUpload mode="simple"
-                          value="#{cartBean.uploadedPrescription}"
-                          allowTypes="/(\.|\/)(png|jpg|jpeg|pdf)$/"
-                          label="Choose File" />
+        <br/><br/>
 
-            <br/><br/>
-
-            <p:commandButton value="Upload"
-                             action="#{cartBean.uploadPrescription}"
-                             ajax="false"/>
-
-        </h:form>
-    </p:dialog>
+        <p:commandButton value="Upload"
+                         icon="pi pi-check"
+                         action="#{cartBean.uploadPrescription}"
+                         ajax="false"/>
+    </h:form>
+</p:dialog>
 
 </h:body>
 </html>
