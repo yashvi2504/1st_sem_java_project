@@ -5,14 +5,16 @@ import entity.Categories;
 import entity.Medicines;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Named("homeBean")
-@RequestScoped
-public class HomeBean {
+@ViewScoped
+public class HomeBean implements Serializable{
 
     @Inject
     private AdminEJBLocal adminEJB;
@@ -21,12 +23,19 @@ public class HomeBean {
     private List<Medicines> medicines;
 //private List<Medicines> medicines;
 private Integer selectedCategoryId;
+private List<Medicines> allMedicines;   // ALL medicines
+
+//    private List<Medicines> allMedicines;      // FULL list
+    private List<Medicines> displayMedicines;  // UI list
 
 @PostConstruct
 public void init() {
     categories = adminEJB.getAllCategories();
   
     medicines = new ArrayList<>(adminEJB.getAllMedicines());
+}
+public List<Medicines> getAllMedicines() {
+    return allMedicines;
 }
 
     public List<Categories> getCategories() {
