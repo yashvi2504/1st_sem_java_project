@@ -460,30 +460,33 @@ public Orders getOrderDetails(Integer orderId, Integer userId) {
 }
 // ✅ FIXED VERSION
 @Override
-
 public Integer savePrescription(Integer userId,
                                 Integer orderId,
                                 Integer medicineId,
                                 String filePath,
                                 String fileType) {
 
+    // ✅ FETCH REQUIRED ENTITIES
     Users user = em.find(Users.class, userId);
     Medicines med = em.find(Medicines.class, medicineId);
+
+    if (user == null || med == null) {
+        throw new RuntimeException("Invalid user or medicine");
+    }
 
     Prescription p = new Prescription();
     p.setUserId(user);
     p.setMedicineId(med);
     p.setFilePath(filePath);
     p.setFileType(fileType);
-    p.setStatus("WAITING");
+    p.setStatus("PENDING");
     p.setUploadedAt(new Date());
 
-    // ✅ ONLY set order if it exists
-Orders order = em.find(Orders.class, orderId);
-if (order == null) {
-    throw new RuntimeException("Order not found while uploading prescription");
-}
-p.setOrderId(order);
+    // ✅ order is OPTIONAL (as YOU requested)
+    if (orderId != null) {
+        Orders order = em.find(Orders.class, orderId);
+        p.setOrderId(order);
+    }
 
     em.persist(p);
     em.flush();
@@ -509,6 +512,22 @@ public Orders getOrderById(Integer orderId) {
     } catch (Exception e) {
         e.printStackTrace();
         return null;
+    }
+}
+@Override
+public void attachPrescriptionToOrder(Integer userId, Integer orderId) {
+
+    List<Prescription> list = em.createQuery(
+        "SELECT p FROM Prescription p WHERE p.userId.userId = :uid AND p.orderId IS NULL",
+        Prescription.class
+    ).setParameter("uid", userId)
+     .getResultList();
+
+    Orders order = em.find(Orders.class, orderId);
+
+    for (Prescription p : list) {
+        p.setOrderId(order);
+        p.setStatus("WAITING_APPROVAL");
     }
 }
 

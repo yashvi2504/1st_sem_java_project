@@ -12,9 +12,13 @@ import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.faces.context.FacesContext;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.primefaces.model.file.UploadedFile;
 
 @Named("orderBean")
 @ViewScoped
@@ -67,6 +71,12 @@ public void init() {
         e.printStackTrace();
     }
 }
+private void addMessage(String msg) {
+    FacesContext.getCurrentInstance().addMessage(
+        null,
+        new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null)
+    );
+}
 
 public List<Orders> getFilteredOrderList() {
 
@@ -103,6 +113,76 @@ public Prescription getPrescriptionByOrder(Integer orderId, Integer medicineId) 
 public void setSelectedStatus(String selectedStatus) {
     this.selectedStatus = selectedStatus;
 }
+private UploadedFile uploadedPrescription;
+private Integer uploadMedicineId;
+private String popupMessage;
+private boolean showPopup;
+//private List<Prescription> prescriptions;
+public void uploadPrescription() {
+
+    try {
+        if (selectedOrder == null || selectedOrder.getOrderId() == null) {
+            addMessage("Order not found.");
+            return;
+        }
+
+        if (uploadMedicineId == null) {
+            addMessage("Medicine not selected!");
+            return;
+        }
+
+        if (uploadedPrescription == null) {
+            addMessage("Please choose a prescription file!");
+            return;
+        }
+
+        String folderPath = "D:/java/yasi/prescriptions/";
+        File folder = new File(folderPath);
+        if (!folder.exists()) folder.mkdirs();
+
+        String fileName = System.currentTimeMillis() + "_"
+                + uploadedPrescription.getFileName();
+
+        File target = new File(folder, fileName);
+
+        try (InputStream in = uploadedPrescription.getInputStream();
+             FileOutputStream out = new FileOutputStream(target)) {
+
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = in.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+        }
+
+        customerEJB.savePrescription(
+                loginBean.getLoggedUser().getUserId(),
+                selectedOrder.getOrderId(),
+                uploadMedicineId,
+                fileName,
+                uploadedPrescription.getContentType()
+        );
+
+        customerEJB.updateOrderStatus(
+                selectedOrder.getOrderId(),
+                "WAITING_APPROVAL"
+        );
+
+        prescriptions = customerEJB.getPrescriptionsByOrder(
+                selectedOrder.getOrderId()
+        );
+
+        uploadedPrescription = null;
+        uploadMedicineId = null;
+
+        popupMessage = "Prescription uploaded successfully!";
+        showPopup = true;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        addMessage("Upload failed!");
+    }
+}
 
 public Prescription getPrescription(Integer medicineId) {
 
@@ -119,9 +199,6 @@ public Prescription getPrescription(Integer medicineId) {
         .findFirst()
         .orElse(null);
 }
-
-private String popupMessage;
-private boolean showPopup;
 
 public String getPopupMessage() {
     return popupMessage;

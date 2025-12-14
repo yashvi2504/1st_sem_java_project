@@ -60,5 +60,6 @@ String registerCustomer(String username, String email, String phone, String pass
 void updatePrescriptionStatus(Integer userId, Integer medicineId, String newStatus);
   boolean hasPrescription(Integer userId, Integer medicineId);
   List<Prescription> getPrescriptionsByOrder(Integer orderId);
+ void attachPrescriptionToOrder(Integer userId, Integer orderId);
 
 }

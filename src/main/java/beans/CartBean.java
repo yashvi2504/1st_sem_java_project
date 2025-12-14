@@ -67,25 +67,26 @@ public void preparePrescriptionUpload(Integer medicineId) {
     this.uploadMedicineId = medicineId;
 }
 public void uploadPrescription() {
-    try {
-        if (currentOrderId == null) {
-    addMessage("Order not found. Please place order first.");
-    return;
-}
 
+    try {
+        // ✅ Medicine must be selected
         if (uploadMedicineId == null) {
             addMessage("Medicine not selected!");
             return;
         }
 
+        // ✅ File must be selected
         if (uploadedPrescription == null) {
             addMessage("Please choose a prescription file!");
             return;
         }
 
+        // ✅ Save file
         String folderPath = "D:/java/yasi/prescriptions/";
         File folder = new File(folderPath);
-        if (!folder.exists()) folder.mkdirs();
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
 
         String fileName = System.currentTimeMillis() + "_"
                 + uploadedPrescription.getFileName();
@@ -102,17 +103,20 @@ public void uploadPrescription() {
             }
         }
 
+        // ✅ SAVE prescription WITHOUT orderId (THIS IS WHAT YOU WANT)
         customerEJB.savePrescription(
                 loginBean.getLoggedUser().getUserId(),
-                currentOrderId,
-//                null,                 // ✅ orderId NOT needed now
+                null,                    // ✅ NO orderId
                 uploadMedicineId,
                 fileName,
                 uploadedPrescription.getContentType()
         );
-customerEJB.updateOrderStatus(currentOrderId, "WAITING_APPROVAL");
 
         addMessage("Prescription uploaded successfully!");
+
+        // reset
+        uploadedPrescription = null;
+        uploadMedicineId = null;
 
     } catch (Exception e) {
         e.printStackTrace();
@@ -227,23 +231,7 @@ private void applyBestOffer() {
     }
     public void confirmOrder() {
     try {
-        for (CartItems ci : cartItems) {
-            if (ci.getMedicineId() != null &&
-                Boolean.TRUE.equals(ci.getMedicineId().getPrescriptionRequired())) {
-
-                boolean uploaded = customerEJB
-                        .hasPrescription(loginBean.getLoggedUser().getUserId(),
-                                          ci.getMedicineId().getMedicineId());
-
-                if (!uploaded) {
-                    FacesContext.getCurrentInstance().addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Prescription required. Please upload prescription before placing order.", null));
-                    return;
-                }
-            }
-        }
-
+      
         Integer userId = loginBean.getLoggedUser().getUserId();
         Integer addressId = customerBean.getSelectedAddress().getAddressId();
         Integer offerId = appliedOffer != null ? appliedOffer.getOfferId() : null;
@@ -255,6 +243,12 @@ private void applyBestOffer() {
         lastPlacedOrderId = order.getOrderId();
 
 currentOrderId = order.getOrderId();   // ✅ ADD THIS LIN
+
+        // ✅ THIS IS THE FIX (DO NOT SKIP)
+        customerEJB.attachPrescriptionToOrder(userId, order.getOrderId());
+                addMessage("Order placed successfully!");
+
+
         loadCart();
 
         addMessage("Order placed successfully!");

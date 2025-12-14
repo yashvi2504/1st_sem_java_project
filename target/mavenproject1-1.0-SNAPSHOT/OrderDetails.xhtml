@@ -112,31 +112,29 @@
                 <!-- UPDATE STATUS SECTION -->
 <h3 class="section-title">Update Order Status</h3>
 
-<h:form>
-    <h:panelGroup style="margin-top:10px;">
+<h:panelGroup style="margin-top:10px;">
 
-        <h:selectOneMenu value="#{orderBean.selectedOrder.status}"
-                         style="padding:6px; width:200px;">
-            <f:selectItem itemValue="Pending" itemLabel="Pending" />
-            <f:selectItem itemValue="Processing" itemLabel="Processing" />
-            <f:selectItem itemValue="Packed" itemLabel="Packed" />
-            <f:selectItem itemValue="Shipped" itemLabel="Shipped" />
-            <f:selectItem itemValue="Delivered" itemLabel="Delivered" />
-            <f:selectItem itemValue="Cancelled" itemLabel="Cancelled" />
-        </h:selectOneMenu>
+    <h:selectOneMenu value="#{orderBean.selectedOrder.status}"
+                     style="padding:6px; width:200px;">
+        <f:selectItem itemValue="Pending" itemLabel="Pending" />
+        <f:selectItem itemValue="Processing" itemLabel="Processing" />
+        <f:selectItem itemValue="Packed" itemLabel="Packed" />
+        <f:selectItem itemValue="Shipped" itemLabel="Shipped" />
+        <f:selectItem itemValue="Delivered" itemLabel="Delivered" />
+        <f:selectItem itemValue="Cancelled" itemLabel="Cancelled" />
+    </h:selectOneMenu>
 
-        <h:commandButton value="Update Status"
-                         action="#{orderBean.updateStatus}"
-                         style="margin-left:10px; 
-                                padding:7px 14px; 
-                                background:#01756e; 
-                                color:white; 
-                                border-radius:6px;" />
+    <h:commandButton value="Update Status"
+                     action="#{orderBean.updateStatus}"
+                     style="margin-left:10px;
+                            padding:7px 14px;
+                            background:#01756e;
+                            color:white;
+                            border-radius:6px;" />
 
-    </h:panelGroup>
+</h:panelGroup>
 
-    <h:messages style="color:green; margin-top:10px;" />
-</h:form>
+<h:messages style="color:green; margin-top:10px;" />
 
                 </p>
 
@@ -207,7 +205,7 @@
 
     <!-- STATUS BADGES -->
 
-    <h:panelGroup rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'WAITING'}">
+    <h:panelGroup rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'WAITING_APPROVAL'}">
         <span class="badge pending">Waiting for Approval</span>
     </h:panelGroup>
 
@@ -222,20 +220,19 @@
     <br/><br/>
 
     <!-- APPROVE / REJECT BUTTONS (ADMIN ONLY, WAITING STATUS ONLY) -->
+<p:commandButton value="Approve"
+    icon="pi pi-check"
+    action="#{orderBean.approvePrescription(i.medicineId.medicineId)}"
+    rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'WAITING_APPROVAL'}"
+    update="@form"
+    style="background:#4caf50;color:white;" />
 
-    <p:commandButton value="Approve"
-        icon="pi pi-check"
-        action="#{orderBean.approvePrescription(i.medicineId.medicineId)}"
-        rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'WAITING'}"
-        update="@all"
-        style="background:#4caf50;color:white;" />
-
-    <p:commandButton value="Reject"
-        icon="pi pi-times"
-        action="#{orderBean.rejectPrescription(i.medicineId.medicineId)}"
-        rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'WAITING'}"
-        update="@all"
-        style="background:#f44336;color:white;margin-left:10px;" />
+<p:commandButton value="Reject"
+    icon="pi pi-times"
+    action="#{orderBean.rejectPrescription(i.medicineId.medicineId)}"
+    rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'WAITING_APPROVAL'}"
+    update="@form"
+    style="background:#f44336;color:white;margin-left:10px;" />
 
 </ui:fragment>
 
@@ -250,7 +247,7 @@
 <!-- ASSIGN DELIVERY PARTNER -->
 <h3 class="section-title">Assign Delivery Partner</h3>
 
-<h:form id="assignForm">
+<!--<h:form id="assignForm">-->
 
     <h:panelGroup>
 
@@ -287,7 +284,7 @@
 
     </h:panelGroup>
 
-</h:form>
+<!--</h:form>-->
 
 <hr/>
 
