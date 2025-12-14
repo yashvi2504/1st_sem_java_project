@@ -30,5 +30,6 @@ public interface DeliveryEJBLocal {
     List<DeliveryTracking> getTrackingHistory(Integer deliveryId);
     void createUser(Users u);
 Roles getRole(String roleName);
+List<Object[]> getDeliveredCountPerDay(Integer partnerId);
 
 }

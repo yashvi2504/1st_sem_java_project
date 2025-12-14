@@ -121,5 +121,19 @@ public Roles getRole(String roleName) {
              .setParameter("roleName", roleName)
              .getSingleResult();
 }
+@Override
+public List<Object[]> getDeliveredCountPerDay(Integer partnerId) {
+
+    return em.createQuery(
+        "SELECT FUNCTION('DATE', MAX(t.updateTime)), COUNT(DISTINCT t.deliveryId.deliveryId) " +
+        "FROM DeliveryTracking t " +
+        "WHERE t.status = 'Delivered' " +
+        "AND t.deliveryId.deliveryPartnerId.deliveryPartnerId = :pid " +
+        "GROUP BY t.deliveryId.deliveryId",
+        Object[].class
+    )
+    .setParameter("pid", partnerId)
+    .getResultList();
+}
 
 }
