@@ -157,14 +157,14 @@
             <p:commandButton value="−"
     action="#{cartBean.decrease(ci.medicineId.medicineId)}"
     rendered="#{ci.medicineId != null}"
-    update="@form"/>
+    update=":mainForm"/>
 
 <span>#{ci.quantity}</span>
 
 <p:commandButton value="+"
     action="#{cartBean.increase(ci.medicineId.medicineId)}"
     rendered="#{ci.medicineId != null}"
-    update="@form"/>
+    update=":mainForm"/>
 
                 <br/><br/>
 
@@ -172,7 +172,7 @@
                 <div class="cart-links">
                     <p:commandLink value="Delete"
                                    actionListener="#{cartBean.remove(ci.cartItemId)}"
-                                   update="@form"/>
+                                   update=":mainForm"/>
                 </div>
 <!-- PRESCRIPTION HANDLING -->
 <h:panelGroup rendered="#{ci.medicineId.prescriptionRequired}">
@@ -210,8 +210,9 @@
 
     <!-- SUBTOTAL -->
     <div class="subtotal">
-        Subtotal (#{cartBean.cartItems.size()} items): ₹#{cartBean.total}
-    </div>
+        Subtotal (#{cartBean.itemCount} items): ₹#{cartBean.total}
+
+      </div>
 
 </div>
 
@@ -255,33 +256,6 @@
 
     </h:form>
 
-
-    <p:dialog header="Add Delivery Address" widgetVar="addressDlg" modal="true" width="400">
-        <h:form id="addressForm">
-
-            <h:panelGrid columns="2" cellpadding="5">
-
-                <h:outputLabel value="Street:" />
-                <p:inputText value="#{customerBean.street}" required="true" />
-
-                <h:outputLabel value="City:" />
-                <p:inputText value="#{customerBean.city}" required="true" />
-
-                <h:outputLabel value="State:" />
-                <p:inputText value="#{customerBean.state}" required="true" />
-
-                <h:outputLabel value="Pincode:" />
-                <p:inputText value="#{customerBean.zip}" required="true" />
-
-            </h:panelGrid>
-
-            <p:commandButton value="Save"
-                             actionListener="#{customerBean.addAddress}"
-                             update="addressForm :mainForm"
-                             oncomplete="PF('addressDlg').hide();" />
-
-        </h:form>
-    </p:dialog>
 
 <p:dialog id="prescDialog"
           header="Upload Prescription"

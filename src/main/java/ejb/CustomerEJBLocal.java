@@ -3,6 +3,7 @@ package ejb;
 
 import entity.Addresses;
 import entity.Cart;
+import entity.CartItems;
 import entity.Categories;
 import entity.Medicines;
 import entity.Offers;
@@ -32,9 +33,8 @@ List<Orders> getAllOrders();
     Collection<Offers> getActiveOffers();
 
     Cart getActiveCart(Integer userId);
-
-    String addOrUpdateCartItem(Integer userId, Integer medicineId, int quantity);
-
+List<CartItems> getCartItems(Integer userId);
+    void addOrUpdateCartItem(Integer userId, Integer medicineId, int qty);
     String removeCartItem(Integer userId, Integer cartItemId);
   
     void addAddressToCustomer(String street, String city, String state, String zip, Integer userId);

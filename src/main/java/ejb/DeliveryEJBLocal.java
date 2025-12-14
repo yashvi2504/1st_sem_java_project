@@ -23,7 +23,7 @@ public interface DeliveryEJBLocal {
 
     // 3️⃣ Update delivery status
     void updateDeliveryStatus(Integer deliveryId, String status);
-
+  DeliveryPartners findPartnerByOrderId(Integer orderId);
     // 4️⃣ View deliveries
     List<Delivery> getAllDeliveries();
     List<Delivery> getDeliveriesByPartner(Integer partnerId);

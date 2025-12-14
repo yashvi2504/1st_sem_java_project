@@ -8,6 +8,7 @@ import entity.CartItems;
 import entity.Offers;
 import entity.Orders;
 import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
@@ -25,7 +26,7 @@ import java.io.InputStream;
 import java.io.File;
 
 @Named("cartBean")
-@ViewScoped
+@SessionScoped
 public class CartBean implements Serializable {
 
     @Inject
@@ -50,10 +51,7 @@ private Integer lastPlacedOrderId;
     public CartBean() {}
 
     // =============== INIT CART =================
-    @PostConstruct
-    public void init() {
-        loadCart();
-    }
+  
 private UploadedFile uploadedPrescription;
 private Integer uploadMedicineId;
 
@@ -123,6 +121,12 @@ public void uploadPrescription() {
         addMessage("Upload failed!");
     }
 }
+public int getItemCount() {
+    if (cartItems == null) {
+        return 0;
+    }
+    return cartItems.size();
+}
 
 private void addMessage(String msg) {
     FacesMessage m = new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null);
@@ -149,23 +153,23 @@ public boolean isPrescriptionRequiredButNotUploaded() {
 }
 
 public void loadCart() {
-    if (loginBean.getLoggedUser() == null) {
+
+    if (loginBean == null || loginBean.getLoggedUser() == null) {
         cartItems = new ArrayList<>();
+        activeCart = null;
         return;
     }
 
-    activeCart = customerEJB.getActiveCart(loginBean.getLoggedUser().getUserId());
+    activeCart = customerEJB.getActiveCart(
+        loginBean.getLoggedUser().getUserId()
+    );
 
-    if (activeCart == null || activeCart.getCartItemsCollection() == null) {
+    if (activeCart == null) {
         cartItems = new ArrayList<>();
-        discountedTotal = 0;
-        appliedOffer = null;
         return;
     }
 
     cartItems = new ArrayList<>(activeCart.getCartItemsCollection());
-
-    // ⭐ AUTO APPLY OFFER
     applyBestOffer();
 }
 
@@ -229,6 +233,7 @@ private void applyBestOffer() {
         customerEJB.removeCartItem(loginBean.getLoggedUser().getUserId(), cartItemId);
         loadCart();
     }
+    
     public void confirmOrder() {
     try {
       
@@ -264,9 +269,30 @@ customerEJB.attachUploadedPrescriptionsToOrder(
 
     // =============== GETTERS & SETTERS ===============
 
-    public List<CartItems> getCartItems() {
-        return cartItems;
+  public List<CartItems> getCartItems() {
+
+    if (loginBean.getLoggedUser() == null) {
+        return new ArrayList<>();
     }
+
+    // 🔥 ALWAYS reload from DB
+    activeCart = customerEJB.getActiveCart(
+        loginBean.getLoggedUser().getUserId()
+    );
+
+    if (activeCart == null) {
+        return new ArrayList<>();
+    }
+
+    cartItems = customerEJB.getCartItems(
+        loginBean.getLoggedUser().getUserId()
+    );
+
+    applyBestOffer();
+
+    return cartItems;
+}
+
 
     public Cart getActiveCart() {
         return activeCart;
@@ -306,12 +332,11 @@ public Offers getAppliedOffer() {
 public double getDiscountedTotal() {
     return discountedTotal;
 }public void increase(Integer medicineId) {
-    if (medicineId == null) return;
     customerEJB.increaseCartItemQuantity(
         loginBean.getLoggedUser().getUserId(), medicineId
     );
-    loadCart();
 }
+
 
 public void decrease(Integer medicineId) {
     if (medicineId == null) return;

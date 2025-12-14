@@ -151,4 +151,17 @@ public Long getDeliveredCountByPartner(Integer partnerId) {
     .getSingleResult();
 }
 
+    @Override
+    public DeliveryPartners findPartnerByOrderId(Integer orderId) {
+        try {
+            return em.createQuery(
+                "SELECT d.deliveryPartner FROM Delivery d WHERE d.orderId.orderId = :oid",
+                DeliveryPartners.class
+            )
+            .setParameter("oid", orderId)
+            .getSingleResult();
+        } catch (Exception e) {
+            return null; // not assigned yet
+        }
+    }
 }

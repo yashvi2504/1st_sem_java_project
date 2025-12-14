@@ -4,6 +4,7 @@ package beans;
 
 import ejb.CustomerEJBLocal;
 import ejb.DeliveryEJBLocal;
+import entity.DeliveryPartners;
 import entity.Orders;
 import entity.Prescription;
 import jakarta.annotation.PostConstruct;
@@ -198,6 +199,11 @@ public Prescription getPrescription(Integer medicineId) {
         )
         .findFirst()
         .orElse(null);
+}
+//@Inject
+//private DeliveryEJBLocal deliveryEJB;
+public DeliveryPartners assignedPartner(Integer orderId) {
+    return deliveryEJB.findPartnerByOrderId(orderId);
 }
 
 public String getPrescriptionStatus(Integer orderId) {

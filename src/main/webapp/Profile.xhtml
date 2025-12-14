@@ -158,6 +158,28 @@
                  ajax="false"
                  style="background:#01756e;color:white;"
                  onclick="window.location.href='ReceiptServlet?orderId=#{o.orderId}'"/>
+<!-- ASSIGNED DELIVERY PARTNER -->
+<!-- ASSIGNED DELIVERY PARTNER -->
+<!-- ASSIGNED DELIVERY PARTNER -->
+<h:panelGroup rendered="#{orderBean.assignedPartner(o.orderId) != null}">
+    <br/>
+    <b>Delivery Partner:</b>
+    #{orderBean.assignedPartner(o.orderId).name}<br/>
+
+    <b>Phone:</b>
+    #{orderBean.assignedPartner(o.orderId).phone}<br/>
+
+    <b>Vehicle:</b>
+    #{orderBean.assignedPartner(o.orderId).vehicleNo}
+</h:panelGroup>
+
+<!-- NOT ASSIGNED -->
+<h:panelGroup rendered="#{orderBean.assignedPartner(o.orderId) == null}">
+    <br/>
+    <span style="color:#888;">Delivery partner not assigned yet.</span>
+</h:panelGroup>
+
+
 
         </div>
 

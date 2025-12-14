@@ -51,6 +51,7 @@ beans\CustomerBean.class
 entity\Invoices.class
 entity\DeliveryPartners.class
 beans\AdminDashboardBean.class
+beans\ShopBean.class
 auth\SecureAuthentication.class
 ejb\DeliveryEJBLocal.class
 validators\ConfirmPasswordValidator.class

@@ -4,6 +4,7 @@ package beans;
 import ejb.CustomerEJBLocal;
 import entity.Addresses;
 import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
@@ -15,7 +16,7 @@ import java.util.List;
 import org.primefaces.event.SelectEvent;
 
 @Named("customerBean")
-@ViewScoped
+@SessionScoped
 public class CustomerBean implements Serializable {
 
     @Inject
@@ -129,25 +130,29 @@ public void onAddressSelect(SelectEvent<Addresses> event) {
     // ---------------------------------------------------------
     // ➤ Add to Cart
     // ---------------------------------------------------------
-  public void addToCart(Integer medicineId) {
+  
+public void addToCart(Integer medicineId) {
+
+    System.out.println("🔥 addToCart called, medicineId = " + medicineId);
 
     if (loginBean.getLoggedUser() == null) {
-        FacesContext.getCurrentInstance().addMessage(null,
-            new FacesMessage(FacesMessage.SEVERITY_WARN, 
-            "Please login first!", null));
+        System.out.println("❌ User NOT logged in");
         return;
     }
 
-    Integer userId = loginBean.getLoggedUser().getUserId();
+    System.out.println("✅ User ID = " + loginBean.getLoggedUser().getUserId());
 
-    customerEJB.addOrUpdateCartItem(userId, medicineId, 1);
+    customerEJB.addOrUpdateCartItem(
+        loginBean.getLoggedUser().getUserId(),
+        medicineId,
+        1
+    );
 
-    FacesContext.getCurrentInstance().addMessage(null,
-        new FacesMessage(FacesMessage.SEVERITY_INFO,
-        "Added to cart!", null));
+    System.out.println("✅ EJB addOrUpdateCartItem called");
+
+    CartBean.loadCart();
 }
-
-    // ---------------------------------------------------------
+/// ---------------------------------------------------------
     // ➤ GETTERS & SETTERS
     // ---------------------------------------------------------
 
@@ -177,49 +182,61 @@ public void onAddressSelect(SelectEvent<Addresses> event) {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
-public int quantity(Integer medicineId) {
+   public int quantity(Integer medicineId) {
+
+    System.out.println("🔁 quantity() called for medicineId = " + medicineId);
+
+    if (medicineId == null) return 0;
     if (loginBean.getLoggedUser() == null) return 0;
-    return customerEJB.getCartItemQuantity(loginBean.getLoggedUser().getUserId(), medicineId);
+
+    int q = customerEJB.getCartItemQuantity(
+        loginBean.getLoggedUser().getUserId(),
+        medicineId
+    );
+
+    System.out.println("📦 Quantity from DB = " + q);
+    return q;
 }
 
+
 public void increase(Integer medicineId) {
-    if (medicineId == null) return;
+
     if (loginBean.getLoggedUser() == null) return;
 
-    customerEJB.increaseCartItemQuantity(loginBean.getLoggedUser().getUserId(), medicineId);
-    // ⭐ IMPORTANT: Reload the cart data after EJB update
-    CartBean.loadCart();
+    customerEJB.increaseCartItemQuantity(
+        loginBean.getLoggedUser().getUserId(),
+        medicineId
+    );
+
+    CartBean.loadCart(); // 🔥 REQUIRED
 }
 
 public void decrease(Integer medicineId) {
-    if (medicineId == null) return;
+
     if (loginBean.getLoggedUser() == null) return;
 
-    customerEJB.decreaseCartItemQuantity(loginBean.getLoggedUser().getUserId(), medicineId);
-        CartBean.loadCart();
+    customerEJB.decreaseCartItemQuantity(
+        loginBean.getLoggedUser().getUserId(),
+        medicineId
+    );
 
+    CartBean.loadCart(); // 🔥 REQUIRED
 }
+// package beans;
+// ... (imports) ...
+// public class CustomerBean implements Serializable {
+
+// ... (other methods) ...
+
 public boolean showAddButton(Integer medicineId) {
-    try {
-        if (medicineId == null) {
-            return true; // show Add to Cart by default
-        }
 
-        if (loginBean.getLoggedUser() == null) {
-            return true; // user not logged in → show Add to Cart
-        }
+    int qty = quantity(medicineId);
+    System.out.println("🧠 showAddButton qty = " + qty);
 
-        int qty = customerEJB.getCartItemQuantity(
-            loginBean.getLoggedUser().getUserId(),
-            medicineId
-        );
-
-        return qty <= 0; // if 0 → show Add, else show +/-
-    } catch (Exception e) {
-        return true;
-    }
+    return qty == 0;
 }
 
+// ... (rest of the class) ...
 
     public String getConfirmPassword() { return confirmPassword; }
     public void setConfirmPassword(String confirmPassword) { this.confirmPassword = confirmPassword; }

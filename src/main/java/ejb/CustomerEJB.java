@@ -138,83 +138,59 @@ public Cart getActiveCart(Integer userId) {
 //    return "Cart updated successfully";
 //}
 @Override
-public String addOrUpdateCartItem(Integer userId, Integer medicineId, int quantity) {
-    if (userId == null || medicineId == null || quantity <= 0) {
-        return "Invalid request";
-    }
+public void addOrUpdateCartItem(Integer userId, Integer medicineId, int qty) {
 
-    Users user = em.find(Users.class, userId);
-    if (user == null) {
-        return "User not found";
-    }
+    Cart cart;
 
-    // 1) find active cart (if any)
-    TypedQuery<Cart> cartQ = em.createNamedQuery("Cart.findActiveByUser", Cart.class);
-    cartQ.setParameter("user", user);
-    Cart cart = cartQ.getResultStream().findFirst().orElse(null);
+    // 1️⃣ Get or create cart
+    try {
+        cart = em.createQuery(
+            "SELECT c FROM Cart c WHERE c.userId.userId = :uid",
+            Cart.class
+        ).setParameter("uid", userId)
+         .getSingleResult();
 
-    // 2) create cart when needed
-    if (cart == null) {
+    } catch (NoResultException e) {
         cart = new Cart();
-        cart.setUserId(user);
-        cart.setCreatedAt(new Date());
+        cart.setUserId(em.find(Users.class, userId));
         cart.setStatus("ACTIVE");
         cart.setTotalAmount(0.0);
-        cart.setCartItemsCollection(new ArrayList<>());
+        cart.setCreatedAt(new Date());
+
         em.persist(cart);
-        em.flush(); // ensure cart gets an ID
+        em.flush(); // VERY IMPORTANT
     }
 
-    // 3) load medicine
-    Medicines med = em.find(Medicines.class, medicineId);
-    if (med == null) {
-        return "Medicine not found";
-    }
-
-    // 4) Try to find existing CartItems row using JPQL
-    CartItems existing = null;
+    // 2️⃣ Check if item already exists
     try {
-        TypedQuery<CartItems> itemQ = em.createQuery(
+        CartItems item = em.createQuery(
             "SELECT ci FROM CartItems ci WHERE ci.cartId.cartId = :cid AND ci.medicineId.medicineId = :mid",
-            CartItems.class);
-        itemQ.setParameter("cid", cart.getCartId());
-        itemQ.setParameter("mid", medicineId);
-        existing = itemQ.getSingleResult();
-    } catch (NoResultException nre) {
-        existing = null;
+            CartItems.class
+        ).setParameter("cid", cart.getCartId())
+         .setParameter("mid", medicineId)
+         .getSingleResult();
+
+        item.setQuantity(item.getQuantity() + qty);
+
+    } catch (NoResultException e) {
+
+        // 3️⃣ Create new CartItem (ALL REQUIRED FIELDS SET)
+        CartItems item = new CartItems();
+        item.setCartId(cart);
+
+        Medicines med = em.find(Medicines.class, medicineId);
+        item.setMedicineId(med);
+
+        item.setQuantity(qty);
+//        item.setPricePerUnit(med.getPrice()); // 🔥 REQUIRED
+item.setPricePerUnit(med.getPrice().doubleValue());
+
+        item.setAddedDate(new Date());        // 🔥 REQUIRED
+
+        em.persist(item);
     }
 
-    if (existing != null) {
-        existing.setQuantity(existing.getQuantity() + quantity);
-        em.merge(existing);
-    } else {
-        CartItems newItem = new CartItems();
-        newItem.setCartId(cart);
-        newItem.setMedicineId(med);
-        newItem.setQuantity(quantity);
-        newItem.setPricePerUnit(med.getPrice() != null ? med.getPrice().doubleValue() : 0.0);
-        newItem.setAddedDate(new Date());
-        em.persist(newItem);
-        em.flush(); // force DB write
-
-        if (cart.getCartItemsCollection() == null) {
-            cart.setCartItemsCollection(new ArrayList<>());
-        }
-        cart.getCartItemsCollection().add(newItem);
-    }
-
-    // 5) recalc total and merge
-    double total = 0.0;
-    if (cart.getCartItemsCollection() != null) {
-        for (CartItems ci : cart.getCartItemsCollection()) {
-            total += (ci.getPricePerUnit() != null ? ci.getPricePerUnit() : 0.0) * ci.getQuantity();
-        }
-    }
-    cart.setTotalAmount(total);
-    em.merge(cart);
-    em.flush();
-
-    return "Cart updated successfully. Total: " + total;
+//    return "SUCCESS";
 }
 
 @Override
@@ -822,5 +798,17 @@ public List<Prescription> getPrescriptionsByOrder(Integer orderId) {
     .setParameter("oid", orderId)
     .getResultList();
 }
+
+       @Override
+    public List<CartItems> getCartItems(Integer userId) {
+
+        return em.createQuery(
+                "SELECT ci FROM CartItems ci " +
+                "WHERE ci.cartId.userId.userId = :uid",
+                CartItems.class
+        )
+        .setParameter("uid", userId)
+        .getResultList();
+    }
 
 }

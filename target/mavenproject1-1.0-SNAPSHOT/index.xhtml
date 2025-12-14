@@ -49,7 +49,6 @@
 
         <!-- LEFT -->
         <div class="flex align-items-center gap-5">
-            
             <span class="logo">Logic Pharmacy</span>
 
             <h:form style="display:flex; gap:15px;">
@@ -80,10 +79,7 @@
 
         <!-- RIGHT -->
         <div class="flex align-items-center gap-4">
-<!-- OFFERS NAV -->
-    <a href="Offer.xhtml" class="nav-link">
-        <i class="pi pi-tag"></i> Offers
-    </a>
+
             <h:panelGroup rendered="#{not empty loginBean.loggedUser}">
                 <a href="Profile.xhtml" class="nav-link">
                     <i class="pi pi-user"></i> Hello, #{loginBean.loggedUser.username}
@@ -241,51 +237,39 @@
                     <div style="margin-top:10px;">Pack of #{homeBean.selectedMedicine.packOf}</div>
                     <p style="margin-top:20px;">#{homeBean.selectedMedicine.description}</p>
 
-               <!--<p:commandButton-->  
-<!--    value="Add To Cart"
-    icon="pi pi-shopping-cart"
-    actionListener="#{customerBean.addToCart(homeBean.selectedMedicine.medicineId)}"
-    process="@this"
-    update=":addressInfoForm:selectedAddress :medicineForm"
-    oncomplete="PF('medicineDlg').hide();"
-    style="background:#01756e;color:white;margin-top:20px;" />-->
-<!-- SHOW ADD TO CART IF QUANTITY = 0 -->
-<!-- SHOW ADD TO CART IF QUANTITY = 0 -->
-<!--<h:panelGroup rendered="#{homeBean.selectedMedicine != null and customerBean.quantity(homeBean.selectedMedicine.medicineId) == 0}">-->
-<h:panelGroup 
-    rendered="#{customerBean.showAddButton(homeBean.selectedMedicine.medicineId)}">
-    
-<p:commandButton  
+        <h:panelGroup id="addBtn"
+    style="#{customerBean.showAddButton(homeBean.selectedMedicine.medicineId)
+             ? 'display:block' : 'display:none'}">
+
+    <p:commandButton
         value="Add To Cart"
         icon="pi pi-shopping-cart"
         actionListener="#{customerBean.addToCart(homeBean.selectedMedicine.medicineId)}"
-        update=":medicineForm"
+        update="medicineDialogContent"
         style="background:#01756e;color:white;margin-top:20px;" />
 </h:panelGroup>
 
 <!-- SHOW + / - WHEN IN CART -->
 <!--<h:panelGroup rendered="#{homeBean.selectedMedicine != null and customerBean.quantity(homeBean.selectedMedicine.medicineId) > 0}"-->
-<h:panelGroup 
-    rendered="#{not customerBean.showAddButton(homeBean.selectedMedicine.medicineId)}"
-    style="margin-top:20px; display:flex; gap:10px; align-items:center;">
+<h:panelGroup id="qtyBox"
+    style="#{customerBean.showAddButton(homeBean.selectedMedicine.medicineId)
+             ? 'display:none' : 'display:flex'}"
+    styleClass="mt-3"
+    layout="block">
 
-    <!-- MINUS -->
-    <p:commandButton value="-" 
-                     style="background:#ccc; color:black; width:40px;"
-                     actionListener="#{customerBean.decrease(homeBean.selectedMedicine.medicineId)}"
-                     update=":medicineForm" />
+    <p:commandButton value="-"
+        actionListener="#{customerBean.decrease(homeBean.selectedMedicine.medicineId)}"
+        update="medicineDialogContent"
+        style="background:#ccc;width:40px;" />
 
-    <!-- QUANTITY -->
-    <span style="font-size:20px; font-weight:bold;">
+    <span style="font-size:20px;font-weight:bold;margin:0 10px;">
         #{customerBean.quantity(homeBean.selectedMedicine.medicineId)}
     </span>
 
-    <!-- PLUS -->
-    <p:commandButton value="+" 
-                     style="background:#01756e; color:white; width:40px;"
-                     actionListener="#{customerBean.increase(homeBean.selectedMedicine.medicineId)}"
-                     update=":medicineForm" />
-
+    <p:commandButton value="+"
+        actionListener="#{customerBean.increase(homeBean.selectedMedicine.medicineId)}"
+        update="medicineDialogContent"
+        style="background:#01756e;color:white;width:40px;" />
 </h:panelGroup>
 
 
