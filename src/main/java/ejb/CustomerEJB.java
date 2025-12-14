@@ -351,7 +351,7 @@ public Orders placeOrderFromCart(Integer userId, Integer shippingAddressId, Stri
     order.setUserId(user);
     order.setDeliveryAddressId(address);
     order.setOrderDate(new Date());
-    order.setStatus("Placed");
+    order.setStatus("PLACED");
     order.setPaymentMethod(paymentMethod);
 
     // ⭐ APPLY OFFER ID TO ORDER
@@ -475,7 +475,7 @@ public Integer savePrescription(Integer userId,
     p.setMedicineId(med);
     p.setFilePath(filePath);
     p.setFileType(fileType);
-    p.setStatus("PENDING");
+    p.setStatus("WAITING");
     p.setUploadedAt(new Date());
 
     // ✅ ONLY set order if it exists

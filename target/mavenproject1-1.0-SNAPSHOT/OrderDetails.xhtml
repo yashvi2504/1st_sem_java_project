@@ -195,49 +195,49 @@
                 <ui:fragment rendered="#{orderBean.getPrescription(i.medicineId.medicineId) == null}">
                     <span style="color:red; font-weight:bold;">Not Uploaded</span>
                 </ui:fragment>
+<ui:fragment rendered="#{orderBean.getPrescription(i.medicineId.medicineId) != null}">
 
-                <ui:fragment rendered="#{orderBean.getPrescription(i.medicineId.medicineId) != null}">
+    <!-- VIEW FILE -->
+    <a href="PrescriptionServlet?file=#{orderBean.getPrescription(i.medicineId.medicineId).filePath}"
+       target="_blank">
+        View File
+    </a>
 
-                    <!-- Show FILE LINK -->
-                  <a href="PrescriptionServlet?file=#{orderBean.getPrescription(i.medicineId.medicineId).filePath}"
-   target="_blank">
-    View File
-</a>
+    <br/><br/>
 
+    <!-- STATUS BADGES -->
 
-                    <br/>
+    <h:panelGroup rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'WAITING'}">
+        <span class="badge pending">Waiting for Approval</span>
+    </h:panelGroup>
 
-                    <!-- Show STATUS BADGE -->
-                    <h:panelGroup rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status == 'PENDING'}">
-                        <span class="badge pending">Pending</span>
-                    </h:panelGroup>
+    <h:panelGroup rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'APPROVED'}">
+        <span class="badge delivered">Approved</span>
+    </h:panelGroup>
 
-                    <h:panelGroup rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status == 'APPROVED'}">
-                        <span class="badge delivered">Approved</span>
-                    </h:panelGroup>
+    <h:panelGroup rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'REJECTED'}">
+        <span class="badge cancelled">Rejected</span>
+    </h:panelGroup>
 
-                    <h:panelGroup rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status == 'REJECTED'}">
-                        <span class="badge cancelled">Rejected</span>
-                    </h:panelGroup>
+    <br/><br/>
 
-                    <br/><br/>
-<h:form>
+    <!-- APPROVE / REJECT BUTTONS (ADMIN ONLY, WAITING STATUS ONLY) -->
 
     <p:commandButton value="Approve"
+        icon="pi pi-check"
         action="#{orderBean.approvePrescription(i.medicineId.medicineId)}"
-        update="@form"
-        rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'PENDING'}"
+        rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'WAITING'}"
+        update="@all"
         style="background:#4caf50;color:white;" />
 
-    <h:commandButton value="Reject"
+    <p:commandButton value="Reject"
+        icon="pi pi-times"
         action="#{orderBean.rejectPrescription(i.medicineId.medicineId)}"
-        rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'PENDING'}"
-        style="background:#f44336; color:white; margin-left:10px;" />
+        rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'WAITING'}"
+        update="@all"
+        style="background:#f44336;color:white;margin-left:10px;" />
 
-</h:form>
-
-
-                </ui:fragment>
+</ui:fragment>
 
             </h:panelGroup>
         </td>

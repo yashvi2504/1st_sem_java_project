@@ -36,6 +36,7 @@ public class CartBean implements Serializable {
 
     @Inject
     private CustomerBean customerBean;   // ⭐ For selected address
+private Integer currentOrderId;   // order being placed
 
     private Cart activeCart;
     private List<CartItems> cartItems;
@@ -98,11 +99,13 @@ public void uploadPrescription() {
 
         customerEJB.savePrescription(
                 loginBean.getLoggedUser().getUserId(),
-                null,                 // ✅ orderId NOT needed now
+                currentOrderId,
+//                null,                 // ✅ orderId NOT needed now
                 uploadMedicineId,
                 fileName,
                 uploadedPrescription.getContentType()
         );
+customerEJB.updateOrderStatus(currentOrderId, "WAITING_APPROVAL");
 
         addMessage("Prescription uploaded successfully!");
 
@@ -216,7 +219,8 @@ private void applyBestOffer() {
         if (loginBean.getLoggedUser() == null) return;
         customerEJB.removeCartItem(loginBean.getLoggedUser().getUserId(), cartItemId);
         loadCart();
-    }public void confirmOrder() {
+    }
+    public void confirmOrder() {
     try {
         for (CartItems ci : cartItems) {
             if (ci.getMedicineId() != null &&
@@ -245,6 +249,7 @@ private void applyBestOffer() {
 
         lastPlacedOrderId = order.getOrderId();
 
+currentOrderId = order.getOrderId();   // ✅ ADD THIS LIN
         loadCart();
 
         addMessage("Order placed successfully!");
