@@ -25,6 +25,7 @@ public class deliveryBean implements Serializable {
 private BarChartModel deliveredPerDayChart;
 
     private static final long serialVersionUID = 1L;
+private static final int RATE_PER_DELIVERY = 50;
 
     @Inject
     private DeliveryEJBLocal deliveryEJB;
@@ -182,6 +183,19 @@ public String getUsername() {
     return getLoggedPartner() != null && getLoggedPartner().getUserId() != null
             ? getLoggedPartner().getUserId().getUsername()
             : "N/A";
+}
+public Long getDeliveredCount() {
+
+    if (getLoggedPartner() == null) {
+        return 0L;
+    }
+
+    return deliveryEJB.getDeliveredCountByPartner(
+            getLoggedPartner().getDeliveryPartnerId()
+    );
+}
+public Long getTotalEarnings() {
+    return getDeliveredCount() * RATE_PER_DELIVERY;
 }
 
 public String getEmail() {

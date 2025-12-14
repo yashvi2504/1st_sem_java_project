@@ -105,6 +105,24 @@
 
     <!-- MAIN CONTENT -->
     <div class="content">
+        <div class="p-grid p-mb-4">
+
+    <div class="p-col-12 p-md-6">
+        <div class="p-card p-p-3">
+            <h3>Total Delivered</h3>
+            <h2>#{deliveryBean.deliveredCount}</h2>
+        </div>
+    </div>
+
+    <div class="p-col-12 p-md-6">
+        <div class="p-card p-p-3">
+            <h3>Total Earnings</h3>
+            <h2>₹#{deliveryBean.totalEarnings}</h2>
+        </div>
+    </div>
+
+</div>
+
 <h3>Delivered Orders (Per Day)</h3>
 
 <p:barChart model="#{deliveryBean.deliveredPerDayChart}"

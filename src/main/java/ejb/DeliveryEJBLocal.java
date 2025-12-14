@@ -31,5 +31,6 @@ public interface DeliveryEJBLocal {
     void createUser(Users u);
 Roles getRole(String roleName);
 List<Object[]> getDeliveredCountPerDay(Integer partnerId);
+Long getDeliveredCountByPartner(Integer partnerId);
 
 }

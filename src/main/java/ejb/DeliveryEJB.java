@@ -120,20 +120,35 @@ public Roles getRole(String roleName) {
     return em.createNamedQuery("Roles.findByRoleName", Roles.class)
              .setParameter("roleName", roleName)
              .getSingleResult();
-}
-@Override
+}@Override
 public List<Object[]> getDeliveredCountPerDay(Integer partnerId) {
 
     return em.createQuery(
-        "SELECT FUNCTION('DATE', MAX(t.updateTime)), COUNT(DISTINCT t.deliveryId.deliveryId) " +
+        "SELECT FUNCTION('DATE', t.updateTime), " +
+        "COUNT(DISTINCT t.deliveryId.deliveryId) " +
         "FROM DeliveryTracking t " +
         "WHERE t.status = 'Delivered' " +
         "AND t.deliveryId.deliveryPartnerId.deliveryPartnerId = :pid " +
-        "GROUP BY t.deliveryId.deliveryId",
+        "GROUP BY FUNCTION('DATE', t.updateTime) " +
+        "ORDER BY FUNCTION('DATE', t.updateTime)",
         Object[].class
     )
     .setParameter("pid", partnerId)
     .getResultList();
+}
+
+@Override
+public Long getDeliveredCountByPartner(Integer partnerId) {
+
+    return em.createQuery(
+        "SELECT COUNT(DISTINCT d.deliveryId) " +
+        "FROM Delivery d " +
+        "WHERE d.status = 'Delivered' " +
+        "AND d.deliveryPartnerId.deliveryPartnerId = :pid",
+        Long.class
+    )
+    .setParameter("pid", partnerId)
+    .getSingleResult();
 }
 
 }
