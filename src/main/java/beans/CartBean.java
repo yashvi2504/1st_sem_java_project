@@ -49,6 +49,11 @@ private Integer lastPlacedOrderId;
     private String paymentMethod;
 
     public CartBean() {}
+@PostConstruct
+public void init() {
+    loadCart();
+    customerBean.ensureAddressSelected(); // 🔥 THIS FIXES UI
+}
 
     // =============== INIT CART =================
   
@@ -234,9 +239,20 @@ private void applyBestOffer() {
         loadCart();
     }
     
-    public void confirmOrder() {
+  public void confirmOrder() {
+
+    // ✅ 1. If cart is empty → DO NOTHING
+    if (cartItems == null || cartItems.isEmpty()) {
+        return; // ⛔ no message, no error popup
+    }
+
+    // ✅ 2. Address safety (auto-selected or existing)
+    if (customerBean.getSelectedAddress() == null) {
+        addMessage("Please add or select an address");
+        return;
+    }
+
     try {
-      
         Integer userId = loginBean.getLoggedUser().getUserId();
         Integer addressId = customerBean.getSelectedAddress().getAddressId();
         Integer offerId = appliedOffer != null ? appliedOffer.getOfferId() : null;
@@ -247,23 +263,17 @@ private void applyBestOffer() {
 
         lastPlacedOrderId = order.getOrderId();
 
-currentOrderId = order.getOrderId();
-customerEJB.attachUploadedPrescriptionsToOrder(
-        loginBean.getLoggedUser().getUserId(),
-        currentOrderId
-);
-
-        // ✅ THIS IS THE FIX (DO NOT SKIP)
-        customerEJB.attachPrescriptionToOrder(userId, order.getOrderId());
-                addMessage("Order placed successfully!");
-
-
-        loadCart();
+        customerEJB.attachUploadedPrescriptionsToOrder(userId, lastPlacedOrderId);
+        customerEJB.attachPrescriptionToOrder(userId, lastPlacedOrderId);
 
         addMessage("Order placed successfully!");
+        loadCart();
 
     } catch (Exception e) {
-        addMessage("Order failed: " + e.getMessage());
+        // ❌ REMOVE cart empty error
+        if (!e.getMessage().contains("Cart is empty")) {
+            addMessage("Order failed");
+        }
     }
 }
 

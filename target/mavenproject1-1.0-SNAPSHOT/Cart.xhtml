@@ -213,6 +213,27 @@
         Subtotal (#{cartBean.itemCount} items): ₹#{cartBean.total}
 
       </div>
+<h3 style="margin-left:40px; margin-top:20px;">
+    Delivery Address
+</h3>
+
+<h:panelGroup rendered="#{customerBean.selectedAddress != null}">
+    <div style="
+        margin-left:40px;
+        padding:12px;
+        border:1px solid #ddd;
+        border-radius:8px;
+        background:#f9f9f9;
+        max-width:500px;
+    ">
+        <b>Delivering to:</b><br/>
+        #{customerBean.selectedAddress.addressLine}<br/>
+        #{customerBean.selectedAddress.city},
+        #{customerBean.selectedAddress.state}
+        -
+        #{customerBean.selectedAddress.pincode}
+    </div>
+</h:panelGroup>
 
 </div>
 

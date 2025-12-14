@@ -188,6 +188,7 @@ item.setPricePerUnit(med.getPrice().doubleValue());
         item.setAddedDate(new Date());        // 🔥 REQUIRED
 
         em.persist(item);
+        
     }
 
 //    return "SUCCESS";
@@ -255,6 +256,7 @@ public String removeCartItem(Integer userId, Integer cartItemId) {
         a.setAddressLine(street);
         a.setCity(city);
         a.setState(state);
+        
         a.setPincode(zip);
         a.setUserId(user);
 

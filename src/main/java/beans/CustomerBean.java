@@ -126,6 +126,16 @@ public void onAddressSelect(SelectEvent<Addresses> event) {
         state = "";
         zip = "";
     }
+private List<Addresses> userAddresses;
+//private Addresses selectedAddress;
+public void ensureAddressSelected() {
+    if (selectedAddress == null) {
+        if (getUserAddresses() != null && !getUserAddresses().isEmpty()) {
+            selectedAddress = getUserAddresses().get(0); // auto-pick first address
+        }
+    }
+}
+
 
     // ---------------------------------------------------------
     // ➤ Add to Cart
