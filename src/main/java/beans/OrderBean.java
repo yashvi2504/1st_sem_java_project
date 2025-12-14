@@ -13,6 +13,7 @@ import jakarta.inject.Named;
 import jakarta.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Named("orderBean")
 @ViewScoped
@@ -66,7 +67,33 @@ public void init() {
     }
 }
 
-    
+public List<Orders> getFilteredOrderList() {
+
+    if (orderList == null || orderList.isEmpty()) {
+        return orderList;
+    }
+
+    if (selectedStatus == null || selectedStatus.equals("ALL")) {
+        return orderList;
+    }
+
+    return orderList.stream()
+            .filter(o -> o.getStatus() != null &&
+                         o.getStatus().equalsIgnoreCase(selectedStatus))
+            .collect(Collectors.toList()); // ✅ WORKS IN JAVA 8+
+}
+
+//    private List<Orders> orderList;
+private String selectedStatus = "ALL";
+public String getSelectedStatus() {
+    return selectedStatus;
+}
+
+public void setSelectedStatus(String selectedStatus) {
+    this.selectedStatus = selectedStatus;
+}
+
+
 public Prescription getPrescription(Integer medicineId) {
     return prescriptions.stream()
             .filter(p -> p.getMedicineId().getMedicineId().equals(medicineId))

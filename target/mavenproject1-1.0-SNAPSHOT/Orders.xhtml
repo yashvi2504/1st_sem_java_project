@@ -160,6 +160,26 @@
 
     <div class="box">
         <h2>Your Orders</h2>
+<h:form id="filterForm">
+
+    <div style="margin-bottom:15px; display:flex; align-items:center; gap:10px;">
+        <h:outputText value="Filter by Status:" style="font-weight:bold;" />
+
+        <p:selectOneMenu value="#{orderBean.selectedStatus}" style="width:200px">
+            <f:selectItem itemLabel="All" itemValue="ALL" />
+            <f:selectItem itemLabel="Pending" itemValue="Pending" />
+            <f:selectItem itemLabel="Processing" itemValue="Processing" />
+            <f:selectItem itemLabel="Shipped" itemValue="Shipped" />
+            <f:selectItem itemLabel="Delivered" itemValue="Delivered" />
+            <f:selectItem itemLabel="Cancelled" itemValue="Cancelled" />
+                        <f:selectItem itemLabel="Placed" itemValue="Placed" />
+
+
+            <p:ajax update="orderList" />
+        </p:selectOneMenu>
+    </div>
+
+</h:form>
 
         <h:panelGroup id="orderList">
 
@@ -183,7 +203,7 @@
                         <th>Action</th>
                     </tr>
 
-                    <ui:repeat value="#{orderBean.orderList}" var="o">
+                    <ui:repeat value="#{orderBean.filteredOrderList}" var="o">
 
                         <tr>
                             <td>#{o.orderId}</td>
