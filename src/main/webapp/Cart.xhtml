@@ -2,177 +2,244 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
 
 <h:head>
     <title>Your Cart</title>
+
+    <style>
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+        }
+
+        .cart-container {
+            width: 85%;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+        }
+
+        .cart-header {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+     .cart-img img {
+    width: 170px;
+    height: 170px;
+    object-fit: contain;
+}
+
+        .cart-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .in-stock {
+            color: green;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .qty-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .qty-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            font-size: 18px;
+        }
+
+        .cart-actions {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .cart-actions a {
+            color: #007185;
+            text-decoration: none;
+            margin-right: 15px;
+        }
+
+        .cart-price {
+            font-size: 20px;
+            font-weight: bold;
+            min-width: 120px;
+            text-align: right;
+        }
+
+        .subtotal {
+            text-align: right;
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            margin-top: 25px;
+            font-weight: 600;
+        }
+
+        .place-order {
+            margin-top: 20px;
+        }
+    </style>
 </h:head>
 
 <h:body>
 
-    <a href="index.xhtml" 
-       style="margin-left:40px; font-size:16px; color:#01756e; text-decoration:none;">
-         ← Back to Shop
-    </a>
+<a href="index.xhtml"
+   style="margin-left:60px; color:#01756e; text-decoration:none;">
+    ← Back to Shop
+</a>
 
-    <h1 style="margin-left:40px;">Your Cart</h1>
+<h:form id="cartForm">
 
-    <h:form id="mainForm">
+<div class="cart-container">
 
-        <p:growl id="msgs" showDetail="true" />
+    <div class="cart-header">Your Cart</div>
 
-        <p:dataTable value="#{cartBean.cartItems}" var="ci"
-                     style="width:95%; margin:auto;">
+    <!-- CART ITEMS -->
+    <ui:repeat value="#{cartBean.cartItems}" var="ci">
 
-            <p:column headerText="Medicine">
-                <h:panelGroup rendered="#{ci.medicineId != null}">
-                    #{ci.medicineId.name}
-                </h:panelGroup>
-                <h:panelGroup rendered="#{ci.medicineId == null}">
-                    <span style="color:red;">Error: Missing Item</span>
-                </h:panelGroup>
-            </p:column>
+        <div class="cart-item">
 
-            <p:column headerText="Qty">
-                <h:panelGroup rendered="#{ci.medicineId != null}">
-                    <div style="display:flex; align-items:center; gap:10px;">
-
-                        <p:commandButton value="-" 
-                                         style="background:#ccc; color:black; width:35px;"
-                                         actionListener="#{customerBean.decrease(ci.medicineId.medicineId)}" update="@form" />
-
-                        <span style="font-size:18px; font-weight:bold;">
-                            #{customerBean.quantity(ci.medicineId.medicineId)} </span>
-
-                        <p:commandButton value="+" 
-                                         style="background:#01756e; color:white; width:35px;"
-                                         actionListener="#{customerBean.increase(ci.medicineId.medicineId)}" update="@form" />
-
-                    </div>
-                </h:panelGroup>
-            </p:column>
-
-
-            <p:column headerText="Line Total">
-                <h:panelGroup rendered="#{ci.medicineId != null}">
-                    ₹#{(ci.pricePerUnit * ci.quantity)}
-                </h:panelGroup>
-            </p:column>
-
-            <p:column headerText="Prescription">
-                <h:panelGroup rendered="#{ci.medicineId != null}">
-
-                    <h:panelGroup rendered="#{ci.medicineId.prescriptionRequired}">
-                        <span style="color:red;">Required</span><br/>
-
-                        <p:commandButton value="Upload"
-                                         action="#{cartBean.preparePrescriptionUpload(ci.medicineId.medicineId)}"
-                                         update=":prescForm"
-                                         oncomplete="PF('prescDialogVar').show();" />
-                    </h:panelGroup>
-
-                    <h:panelGroup rendered="#{!ci.medicineId.prescriptionRequired}">
-                        <span style="color:green;">Not Required</span>
-                    </h:panelGroup>
-
-                </h:panelGroup>
-            </p:column>
-
-            <p:column headerText="Actions">
-                <p:commandButton value="Remove"
-                                 actionListener="#{cartBean.remove(ci.cartItemId)}"
-                                 update="mainForm" />
-            </p:column>
-
-        </p:dataTable>
-
-
-        <h3 style="margin-left:40px; margin-top:20px; color:#01756e;">
-            <strong>Available Offer:</strong>
-        </h3>
-
-        <h:panelGroup rendered="#{cartBean.appliedOffer != null}">
-            <div style="margin-left:40px; color:green; font-size:18px;">
-                🎁 <b>#{cartBean.appliedOffer.offerTitle}</b><br/>
-                #{cartBean.appliedOffer.offerDescription}<br/><br/>
-                <b>Discount Applied!</b>
+            <!-- IMAGE -->
+            <div class="cart-img">
+                <img src="medicine_images/#{ci.medicineId.picture}" />
             </div>
-        </h:panelGroup>
 
-        <h:panelGroup rendered="#{cartBean.appliedOffer == null}">
-            <div style="margin-left:40px; color:red;">
-                No offer available.
+          <div class="cart-details">
+
+    <!-- NAME -->
+    <div class="item-name">
+        #{ci.medicineId.name}
+    </div>
+
+    <!-- BRAND -->
+    <div style="font-size:14px; color:#555;">
+        Brand: <b>#{ci.medicineId.brand}</b>
+    </div>
+
+
+
+    <!-- PACK SIZE -->
+    <div style="font-size:14px; margin-top:4px;">
+        Pack of: #{ci.medicineId.packOf}
+    </div>
+
+
+
+    <!-- PRESCRIPTION INFO -->
+    <h:panelGroup rendered="#{ci.medicineId.prescriptionRequired}">
+        <div style="margin-top:6px; color:#d32f2f; font-weight:600;">
+            ⚠ Prescription Required
+        </div>
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{!ci.medicineId.prescriptionRequired}">
+        <div style="margin-top:6px; color:#388e3c;">
+            ✔ No Prescription Needed
+        </div>
+    </h:panelGroup>
+
+    <!-- QUANTITY -->
+    <div class="qty-box">
+        <p:commandButton value="−"
+                         styleClass="qty-btn"
+                         actionListener="#{customerBean.decrease(ci.medicineId.medicineId)}"
+                         update="@form" />
+
+        <span style="font-size:18px;">
+            #{customerBean.quantity(ci.medicineId.medicineId)}
+        </span>
+
+        <p:commandButton value="+"
+                         styleClass="qty-btn"
+                         actionListener="#{customerBean.increase(ci.medicineId.medicineId)}"
+                         update="@form" />
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="cart-actions">
+        <p:commandLink value="Delete"
+                       actionListener="#{cartBean.remove(ci.cartItemId)}"
+                       update="@form" />
+    </div>
+
+</div>
+
+            <!-- PRICE -->
+            <div class="cart-price">
+                ₹#{ci.pricePerUnit * ci.quantity}
             </div>
-        </h:panelGroup>
 
-        <h3 style="margin-left:40px; margin-top:20px;">
-            Total: ₹#{cartBean.total}
-        </h3>
+        </div>
 
-        <h3 style="margin-left:40px; margin-top:20px;">Choose Payment Method</h3>
+    </ui:repeat>
 
-        <p:selectOneRadio value="#{cartBean.paymentMethod}" style="margin-left:40px;">
-            <f:selectItem itemLabel="COD (Cash on Delivery)" itemValue="COD" />
-            <f:selectItem itemLabel="Online Payment" itemValue="ONLINE" />
-        </p:selectOneRadio>
+    <!-- SUBTOTAL -->
+    <div class="subtotal">
+        Subtotal (#{cartBean.cartItems.size()} items): ₹#{cartBean.total}
+    </div>
 
+    <!-- OFFER -->
+    <div class="section-title">Available Offer</div>
+
+    <h:panelGroup rendered="#{cartBean.appliedOffer != null}">
+        <div style="color:green;">
+            🎁 #{cartBean.appliedOffer.offerTitle}<br/>
+            #{cartBean.appliedOffer.offerDescription}
+        </div>
+    </h:panelGroup>
+
+    <h:panelGroup rendered="#{cartBean.appliedOffer == null}">
+        <div style="color:red;">No offer available.</div>
+    </h:panelGroup>
+
+    <!-- PAYMENT -->
+    <div class="section-title">Choose Payment Method</div>
+
+    <p:selectOneRadio value="#{cartBean.paymentMethod}">
+        <f:selectItem itemLabel="COD (Cash on Delivery)" itemValue="COD" />
+        <f:selectItem itemLabel="Online Payment" itemValue="ONLINE" />
+    </p:selectOneRadio>
+
+    <!-- PLACE ORDER -->
+    <div class="place-order">
         <p:commandButton value="Place Order"
                          icon="pi pi-check"
                          actionListener="#{cartBean.confirmOrder}"
-                         update="mainForm"
-                         oncomplete="if (args.showAddressDialog) PF('addressDlg').show();"
-                         style="margin-left:40px; margin-top:10px;
-                                 background:#01756e; color:white; padding:10px 20px;" />
+                         update="@form"
+                         style="background:#01756e; color:white;
+                                padding:12px 30px; font-size:16px;" />
+    </div>
 
-    </h:form>
+</div>
 
-
-    <p:dialog header="Add Delivery Address" widgetVar="addressDlg" modal="true" width="400">
-        <h:form id="addressForm">
-
-            <h:panelGrid columns="2" cellpadding="5">
-
-                <h:outputLabel value="Street:" />
-                <p:inputText value="#{customerBean.street}" required="true" />
-
-                <h:outputLabel value="City:" />
-                <p:inputText value="#{customerBean.city}" required="true" />
-
-                <h:outputLabel value="State:" />
-                <p:inputText value="#{customerBean.state}" required="true" />
-
-                <h:outputLabel value="Pincode:" />
-                <p:inputText value="#{customerBean.zip}" required="true" />
-
-            </h:panelGrid>
-
-            <p:commandButton value="Save"
-                             actionListener="#{customerBean.addAddress}"
-                             update="addressForm :mainForm"
-                             oncomplete="PF('addressDlg').hide();" />
-
-        </h:form>
-    </p:dialog>
-
-
-    <p:dialog id="prescDialog" header="Upload Prescription"
-              widgetVar="prescDialogVar" modal="true" width="400">
-
-        <h:form id="prescForm" enctype="multipart/form-data">
-
-            <p:fileUpload mode="simple"
-                          value="#{cartBean.uploadedPrescription}"
-                          allowTypes="/(\.|\/)(png|jpg|jpeg|pdf)$/"
-                          label="Choose File" />
-
-            <br/><br/>
-
-            <p:commandButton value="Upload"
-                             action="#{cartBean.uploadPrescription}"
-                             ajax="false"/>
-
-        </h:form>
-    </p:dialog>
+</h:form>
 
 </h:body>
 </html>

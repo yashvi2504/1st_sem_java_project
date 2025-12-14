@@ -30,7 +30,7 @@ private List<Prescription> prescriptions;
     private List<Orders> orderList;  // All orders
     private Orders selectedOrder;    // Single order details
 
- @PostConstruct
+@PostConstruct
 public void init() {
 
     // If Admin → load all orders
@@ -42,7 +42,8 @@ public void init() {
     else {
         // Normal customer → load only their orders
         if (loginBean.getLoggedUser() != null) {
-            orderList = customerEJB.getOrderHistory(loginBean.getLoggedUser().getUserId());
+            orderList = customerEJB.getOrderHistory(
+                    loginBean.getLoggedUser().getUserId());
         }
     }
 
@@ -56,9 +57,9 @@ public void init() {
         if (orderIdParam != null) {
             Integer orderId = Integer.valueOf(orderIdParam);
             selectedOrder = customerEJB.getOrderById(orderId);
-            
-    prescriptions = customerEJB.getPrescriptionsByUser(selectedOrder.getUserId().getUserId());
 
+            prescriptions = customerEJB.getPrescriptionsByUser(
+                    selectedOrder.getUserId().getUserId());
         }
 
     } catch (Exception e) {
@@ -82,6 +83,15 @@ public String getPopupMessage() {
 
 public boolean isShowPopup() {
     return showPopup;
+}
+private Orders latestOrder;
+
+public Orders getLatestOrder() {
+    return latestOrder;
+}
+
+public boolean hasLatestOrder() {
+    return latestOrder != null;
 }
 
 public void approvePrescription(Integer medicineId) {
