@@ -49,6 +49,7 @@
 
         <!-- LEFT -->
         <div class="flex align-items-center gap-5">
+            
             <span class="logo">Logic Pharmacy</span>
 
             <h:form style="display:flex; gap:15px;">
@@ -79,7 +80,10 @@
 
         <!-- RIGHT -->
         <div class="flex align-items-center gap-4">
-
+<!-- OFFERS NAV -->
+    <a href="Offer.xhtml" class="nav-link">
+        <i class="pi pi-tag"></i> Offers
+    </a>
             <h:panelGroup rendered="#{not empty loginBean.loggedUser}">
                 <a href="Profile.xhtml" class="nav-link">
                     <i class="pi pi-user"></i> Hello, #{loginBean.loggedUser.username}

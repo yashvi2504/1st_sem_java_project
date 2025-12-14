@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets">
+
+<h:head>
+    <title>Offers - Logic Pharmacy</title>
+
+    <style>
+        body {
+            background:#f4f6f9;
+            font-family: Arial;
+            margin: 0;
+        }
+
+        .container {
+            width: 900px;
+            margin: 40px auto;
+        }
+
+        h1 {
+            color:#01756e;
+            text-align:center;
+            margin-bottom:30px;
+        }
+
+        .offer-card {
+            background:white;
+            padding:20px;
+            border-radius:10px;
+            box-shadow:0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom:20px;
+            border-left:6px solid #01756e;
+        }
+
+        .offer-title {
+            font-size:20px;
+            font-weight:bold;
+            color:#01756e;
+        }
+
+        .offer-desc {
+            margin-top:8px;
+            color:#555;
+        }
+
+        .offer-discount {
+            margin-top:10px;
+            font-size:18px;
+            font-weight:bold;
+            color:#d32f2f;
+        }
+
+        .offer-min {
+            margin-top:6px;
+            font-size:14px;
+            color:#333;
+        }
+
+        .back {
+            display:block;
+            margin-bottom:20px;
+            text-decoration:none;
+            color:#01756e;
+            font-weight:bold;
+        }
+    </style>
+</h:head>
+
+<h:body>
+
+<div class="container">
+
+    <a href="index.xhtml" class="back">← Back to Home</a>
+
+    <h1>Available Offers</h1>
+
+    <!-- NO OFFERS -->
+    <h:panelGroup rendered="#{empty offerBean.offerList}">
+        <p style="text-align:center;color:#777;">
+            No offers available right now.
+        </p>
+    </h:panelGroup>
+
+    <!-- OFFERS LIST -->
+    <ui:repeat value="#{offerBean.offerList}" var="o">
+
+        <!-- SHOW ONLY ACTIVE OFFERS -->
+        <h:panelGroup rendered="#{o.active}">
+
+            <div class="offer-card">
+
+                <div class="offer-title">
+                    #{o.offerTitle}
+                </div>
+
+                <div class="offer-desc">
+                    #{o.offerDescription}
+                </div>
+
+                <div class="offer-discount">
+                    <h:outputText rendered="#{o.discountType eq 'PERCENT'}"
+                                  value="#{o.discountValue}% OFF" />
+
+                    <h:outputText rendered="#{o.discountType eq 'FIXED'}"
+                                  value="₹#{o.discountValue} OFF" />
+                </div>
+
+                <h:panelGroup rendered="#{o.minOrderAmount gt 0}">
+                    <div class="offer-min">
+                        Minimum order ₹#{o.minOrderAmount}
+                    </div>
+                </h:panelGroup>
+
+            </div>
+
+        </h:panelGroup>
+
+    </ui:repeat>
+
+</div>
+
+</h:body>
+</html>
