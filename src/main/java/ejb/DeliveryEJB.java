@@ -62,8 +62,7 @@ public class DeliveryEJB implements DeliveryEJBLocal {
     }
 
     // 3️⃣ Update delivery status
-  
-@Override
+   @Override
 public void updateDeliveryStatus(Integer deliveryId, String status) {
 
     Delivery delivery = em.find(Delivery.class, deliveryId);

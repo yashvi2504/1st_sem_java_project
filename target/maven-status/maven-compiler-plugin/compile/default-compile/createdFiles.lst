@@ -13,6 +13,7 @@ entity\OrderItems.class
 entity\Addresses.class
 ejb\CustomerEJBLocal.class
 client\MyRestFilter.class
+dto\DeliveryPerDayDTO.class
 entity\Categories.class
 com\mycompany\mavenproject1\resources\SecureResource.class
 filter\NoCacheFilter.class
