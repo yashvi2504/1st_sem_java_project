@@ -46,7 +46,7 @@
             border-radius:6px;
             font-size:13px;
             font-weight:bold;
-            color:white;
+            color:blue;
         }
         .pending { background:#ff9800; }
         .processing { background:#2196f3; }
@@ -218,6 +218,20 @@
                                     #{o.status.toLowerCase() eq 'cancelled' ? 'cancelled' : ''}">
                                     #{o.status}
                                 </span>
+                                <br/>
+                                
+    <!-- PRESCRIPTION STATUS -->
+    <h:panelGroup rendered="#{orderBean.getPrescriptionStatus(o.orderId) != null}">
+        <small>
+            Rx:
+            <span class="badge
+                #{orderBean.getPrescriptionStatus(o.orderId) eq 'WAITING_APPROVAL' ? 'pending' : ''}
+                #{orderBean.getPrescriptionStatus(o.orderId) eq 'APPROVED' ? 'delivered' : ''}
+                #{orderBean.getPrescriptionStatus(o.orderId) eq 'REJECTED' ? 'cancelled' : ''}">
+                #{orderBean.getPrescriptionStatus(o.orderId)}
+            </span>
+        </small>
+    </h:panelGroup>
                             </td>
 
                             <td>₹#{o.totalAmount}</td>

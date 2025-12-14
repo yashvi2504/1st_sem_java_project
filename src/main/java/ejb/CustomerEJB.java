@@ -543,6 +543,20 @@ public Prescription getPrescriptionByOrderAndMedicine(Integer orderId, Integer m
     .findFirst()
     .orElse(null);
 }
+@Override
+public String getPrescriptionStatusByOrder(Integer orderId) {
+    try {
+        return em.createQuery(
+            "SELECT p.status FROM Prescription p WHERE p.orderId.orderId = :oid",
+            String.class
+        )
+        .setParameter("oid", orderId)
+        .setMaxResults(1)
+        .getSingleResult();
+    } catch (Exception e) {
+        return null;
+    }
+}
 
 @Override
 public void attachPrescriptionToOrder(Integer userId, Integer orderId) {

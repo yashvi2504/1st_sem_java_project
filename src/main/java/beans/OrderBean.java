@@ -200,6 +200,10 @@ public Prescription getPrescription(Integer medicineId) {
         .orElse(null);
 }
 
+public String getPrescriptionStatus(Integer orderId) {
+    return customerEJB.getPrescriptionStatusByOrder(orderId);
+}
+
 public String getPopupMessage() {
     return popupMessage;
 }

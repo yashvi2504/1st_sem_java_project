@@ -111,6 +111,17 @@
       #{o.status.toLowerCase() eq 'cancelled' ? 'status-cancelled' : ''}">
     #{o.status}
 </span>
+            <h:panelGroup rendered="#{orderBean.getPrescriptionStatus(o.orderId) != null}">
+    <b>Prescription:</b>
+
+    <span class="status-badge
+        #{orderBean.getPrescriptionStatus(o.orderId) eq 'WAITING_APPROVAL' ? 'status-pending' : ''}
+        #{orderBean.getPrescriptionStatus(o.orderId) eq 'APPROVED' ? 'status-delivered' : ''}
+        #{orderBean.getPrescriptionStatus(o.orderId) eq 'REJECTED' ? 'status-cancelled' : ''}">
+        #{orderBean.getPrescriptionStatus(o.orderId)}
+    </span>
+</h:panelGroup>
+
             <!-- CANCEL ORDER BUTTON (Only when status = Placed) -->
 <h:panelGroup rendered="#{o.status eq 'Placed' or o.status eq 'Pending' or o.status eq 'Processing'}">
     <h:form>
