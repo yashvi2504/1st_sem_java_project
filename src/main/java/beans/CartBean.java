@@ -68,6 +68,11 @@ public void preparePrescriptionUpload(Integer medicineId) {
 }
 public void uploadPrescription() {
     try {
+        if (currentOrderId == null) {
+    addMessage("Order not found. Please place order first.");
+    return;
+}
+
         if (uploadMedicineId == null) {
             addMessage("Medicine not selected!");
             return;

@@ -89,6 +89,16 @@ private String selectedStatus = "ALL";
 public String getSelectedStatus() {
     return selectedStatus;
 }
+public Prescription getPrescriptionByOrder(Integer orderId, Integer medicineId) {
+    if (orderId == null || medicineId == null) return null;
+
+    return customerEJB.getPrescriptionsByOrder(orderId)
+            .stream()
+            .filter(p -> p.getMedicineId() != null &&
+                         p.getMedicineId().getMedicineId().equals(medicineId))
+            .findFirst()
+            .orElse(null);
+}
 
 public void setSelectedStatus(String selectedStatus) {
     this.selectedStatus = selectedStatus;

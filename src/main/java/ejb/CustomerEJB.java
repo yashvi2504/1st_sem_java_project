@@ -479,10 +479,11 @@ public Integer savePrescription(Integer userId,
     p.setUploadedAt(new Date());
 
     // ✅ ONLY set order if it exists
-    if (orderId != null) {
-        Orders order = em.find(Orders.class, orderId);
-        p.setOrderId(order);
-    }
+Orders order = em.find(Orders.class, orderId);
+if (order == null) {
+    throw new RuntimeException("Order not found while uploading prescription");
+}
+p.setOrderId(order);
 
     em.persist(p);
     em.flush();
@@ -517,41 +518,10 @@ public void updateOrderStatus(Integer orderId, String newStatus) {
     Orders order = em.find(Orders.class, orderId);
     if (order == null) return;
 
-    // 🔒 BLOCK order if prescription not approved
-    if (newStatus.equalsIgnoreCase("Packed")
-            || newStatus.equalsIgnoreCase("Shipped")
-            || newStatus.equalsIgnoreCase("Delivered")) {
-
-        for (OrderItems item : order.getOrderItemsCollection()) {
-
-            Medicines med = item.getMedicineId();
-
-            if (Boolean.TRUE.equals(med.getPrescriptionRequired())) {
-
-               Prescription p = em.createQuery(
-    "SELECT p FROM Prescription p WHERE p.orderId.orderId = :oid AND p.medicineId.medicineId = :mid",
-    Prescription.class)
-    .setParameter("oid", order.getOrderId())
-    .setParameter("mid", med.getMedicineId())
-
-                        .getResultStream()
-                        .findFirst()
-                        .orElse(null);
-
-                if (p == null) {
-                    throw new RuntimeException(
-                        "Prescription not uploaded for medicine: " + med.getName()
-                    );
-                }
-
-                if (!"APPROVED".equalsIgnoreCase(p.getStatus())) {
-                    throw new RuntimeException(
-                        "Prescription not approved for medicine: " + med.getName()
-                    );
-                }
-            }
-        }
-    }
+   // Optional: only block if explicitly rejected
+if ("REJECTED".equalsIgnoreCase(order.getStatus())) {
+    throw new RuntimeException("Order contains rejected prescription");
+}
 
     // 📦 Reduce stock only AFTER validation
     if (newStatus.equalsIgnoreCase("Packed")
