@@ -2,10 +2,113 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="jakarta.faces.facelets">
 
 <h:head>
     <title>Your Cart</title>
+    <style>
+.cart-container {
+    width: 95%;
+    margin: auto;
+}
+
+.cart-item {
+    display: grid;
+    grid-template-columns: 200px 1fr 150px; /* ⬅ bigger image */
+    gap: 25px;
+    padding: 25px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.cart-img img {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+}
+
+.cart-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.stock {
+    color: #007600;
+    font-size: 14px;
+}
+
+.qty-box {
+    display: inline-flex;
+    align-items: center;
+    border: 2px solid #ffd814;
+    border-radius: 25px;
+    padding: 4px 10px;
+    gap: 10px;
+}
+.meta {
+    font-size: 15px;
+    color: #555;
+    margin-top: 4px;
+}
+
+.prescription-badge {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+.prescription-required {
+    background: #ffe6e6;
+    color: #b30000;
+}
+
+.prescription-not-required {
+    background: #e6fff0;
+    color: #007a3d;
+}
+
+.qty-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.cart-links a {
+    color: #007185;
+    font-size: 14px;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.cart-links a:hover {
+    text-decoration: underline;
+}
+
+.cart-price {
+    font-size: 18px;
+    font-weight: bold;
+    text-align: right;
+}
+
+.subtotal {
+    text-align: right;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 20px;
+}
+.description {
+    margin-top: 6px;
+    font-size: 16px;
+    color: #444;
+    line-height: 1.4;
+}
+
+</style>
+
 </h:head>
 
 <h:body>
@@ -21,70 +124,75 @@
 
         <p:growl id="msgs" showDetail="true" />
 
-        <p:dataTable value="#{cartBean.cartItems}" var="ci"
-                     style="width:95%; margin:auto;">
+   <div class="cart-container">
 
-            <p:column headerText="Medicine">
-                <h:panelGroup rendered="#{ci.medicineId != null}">
+    <ui:repeat value="#{cartBean.cartItems}" var="ci">
+
+        <div class="cart-item">
+
+            <!-- IMAGE -->
+            <div class="cart-img">
+                <img src="medicine_images/#{ci.medicineId.picture}" />
+            </div>
+
+            <!-- DETAILS -->
+            <div>
+                <div class="cart-title">
                     #{ci.medicineId.name}
-                </h:panelGroup>
-                <h:panelGroup rendered="#{ci.medicineId == null}">
-                    <span style="color:red;">Error: Missing Item</span>
-                </h:panelGroup>
-            </p:column>
+                </div>
 
-            <p:column headerText="Qty">
-                <h:panelGroup rendered="#{ci.medicineId != null}">
-                    <div style="display:flex; align-items:center; gap:10px;">
+<!-- DESCRIPTION -->
+<div class="description">
+    #{ci.medicineId.description}
+</div>
+                <div class="stock">In stock</div>
 
-                        <p:commandButton value="-" 
-                                         style="background:#ccc; color:black; width:35px;"
-                                         actionListener="#{customerBean.decrease(ci.medicineId.medicineId)}" update="@form" />
+<div class="meta">
+    Pack: #{ci.medicineId.packOf}
+</div>
+                
+                <br/>
 
-                        <span style="font-size:18px; font-weight:bold;">
-                            #{customerBean.quantity(ci.medicineId.medicineId)} </span>
+                <!-- QUANTITY -->
+                <div class="qty-box">
+                    <p:commandButton value="−"
+                                     styleClass="qty-btn"
+                                     actionListener="#{customerBean.decrease(ci.medicineId.medicineId)}"
+                                     update="@form"/>
 
-                        <p:commandButton value="+" 
-                                         style="background:#01756e; color:white; width:35px;"
-                                         actionListener="#{customerBean.increase(ci.medicineId.medicineId)}" update="@form" />
+                    <span>#{customerBean.quantity(ci.medicineId.medicineId)}</span>
 
-                    </div>
-                </h:panelGroup>
-            </p:column>
+                    <p:commandButton value="+"
+                                     styleClass="qty-btn"
+                                     actionListener="#{customerBean.increase(ci.medicineId.medicineId)}"
+                                     update="@form"/>
+                </div>
 
+                <br/><br/>
 
-            <p:column headerText="Line Total">
-                <h:panelGroup rendered="#{ci.medicineId != null}">
-                    ₹#{(ci.pricePerUnit * ci.quantity)}
-                </h:panelGroup>
-            </p:column>
+                <!-- ACTION LINKS -->
+                <div class="cart-links">
+                    <p:commandLink value="Delete"
+                                   actionListener="#{cartBean.remove(ci.cartItemId)}"
+                                   update="@form"/>
+                </div>
+            </div>
 
-            <p:column headerText="Prescription">
-                <h:panelGroup rendered="#{ci.medicineId != null}">
+            <!-- PRICE -->
+            <div class="cart-price">
+                ₹#{ci.pricePerUnit * ci.quantity}
+            </div>
 
-                    <h:panelGroup rendered="#{ci.medicineId.prescriptionRequired}">
-                        <span style="color:red;">Required</span><br/>
+        </div>
 
-                        <p:commandButton value="Upload"
-                                         action="#{cartBean.preparePrescriptionUpload(ci.medicineId.medicineId)}"
-                                         update=":prescForm"
-                                         oncomplete="PF('prescDialogVar').show();" />
-                    </h:panelGroup>
+    </ui:repeat>
 
-                    <h:panelGroup rendered="#{!ci.medicineId.prescriptionRequired}">
-                        <span style="color:green;">Not Required</span>
-                    </h:panelGroup>
+    <!-- SUBTOTAL -->
+    <div class="subtotal">
+        Subtotal (#{cartBean.cartItems.size()} items): ₹#{cartBean.total}
+    </div>
 
-                </h:panelGroup>
-            </p:column>
-
-            <p:column headerText="Actions">
-                <p:commandButton value="Remove"
-                                 actionListener="#{cartBean.remove(ci.cartItemId)}"
-                                 update="mainForm" />
-            </p:column>
-
-        </p:dataTable>
+</div>
 
 
         <h3 style="margin-left:40px; margin-top:20px; color:#01756e;">
