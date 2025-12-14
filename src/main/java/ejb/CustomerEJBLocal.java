@@ -61,5 +61,7 @@ void updatePrescriptionStatus(Integer userId, Integer medicineId, String newStat
   boolean hasPrescription(Integer userId, Integer medicineId);
   List<Prescription> getPrescriptionsByOrder(Integer orderId);
  void attachPrescriptionToOrder(Integer userId, Integer orderId);
+void attachUploadedPrescriptionsToOrder(Integer userId, Integer orderId);
+Prescription getPrescriptionByOrderAndMedicine(Integer orderId, Integer medicineId);
 
 }

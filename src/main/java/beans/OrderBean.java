@@ -207,6 +207,11 @@ public String getPopupMessage() {
 public boolean isShowPopup() {
     return showPopup;
 }
+public Prescription getPrescription(Integer orderId, Integer medicineId) {
+
+    return customerEJB.getPrescriptionByOrderAndMedicine(orderId, medicineId);
+}
+
 
 public void approvePrescription(Integer medicineId) {
 

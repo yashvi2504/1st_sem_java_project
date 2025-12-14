@@ -515,6 +515,36 @@ public Orders getOrderById(Integer orderId) {
     }
 }
 @Override
+public void attachUploadedPrescriptionsToOrder(Integer userId, Integer orderId) {
+
+    List<Prescription> list = em.createQuery(
+        "SELECT p FROM Prescription p WHERE p.userId.userId = :uid AND p.orderId IS NULL",
+        Prescription.class
+    ).setParameter("uid", userId).getResultList();
+
+    Orders order = em.find(Orders.class, orderId);
+
+    for (Prescription p : list) {
+        p.setOrderId(order);
+        p.setStatus("WAITING_APPROVAL");
+        em.merge(p);
+    }
+}
+@Override
+public Prescription getPrescriptionByOrderAndMedicine(Integer orderId, Integer medicineId) {
+
+    return em.createQuery(
+        "SELECT p FROM Prescription p WHERE p.orderId.orderId = :oid AND p.medicineId.medicineId = :mid",
+        Prescription.class
+    )
+    .setParameter("oid", orderId)
+    .setParameter("mid", medicineId)
+    .getResultStream()
+    .findFirst()
+    .orElse(null);
+}
+
+@Override
 public void attachPrescriptionToOrder(Integer userId, Integer orderId) {
 
     List<Prescription> list = em.createQuery(

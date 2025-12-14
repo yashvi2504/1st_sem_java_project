@@ -242,7 +242,11 @@ private void applyBestOffer() {
 
         lastPlacedOrderId = order.getOrderId();
 
-currentOrderId = order.getOrderId();   // ✅ ADD THIS LIN
+currentOrderId = order.getOrderId();
+customerEJB.attachUploadedPrescriptionsToOrder(
+        loginBean.getLoggedUser().getUserId(),
+        currentOrderId
+);
 
         // ✅ THIS IS THE FIX (DO NOT SKIP)
         customerEJB.attachPrescriptionToOrder(userId, order.getOrderId());
