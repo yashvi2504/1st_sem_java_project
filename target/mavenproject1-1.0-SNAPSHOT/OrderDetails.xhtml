@@ -221,23 +221,22 @@
                     </h:panelGroup>
 
                     <br/><br/>
+<h:form>
 
-                    <!-- Approve / Reject Buttons -->
-                    <h:form>
+    <p:commandButton value="Approve"
+        action="#{orderBean.approvePrescription(i.medicineId.medicineId)}"
+        update="@form"
+        rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'PENDING'}"
+        style="background:#4caf50;color:white;" />
 
-                        <p:commandButton value="Approve"
-                 action="#{orderBean.approvePrescription(i.medicineId.medicineId)}"
-                 update="@form"
-                 oncomplete="PF('statusDlg').show()"
-                 rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'PENDING'}"
-                 style="background:#4caf50;color:white;" />
+    <h:commandButton value="Reject"
+        action="#{orderBean.rejectPrescription(i.medicineId.medicineId)}"
+        rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'PENDING'}"
+        style="background:#f44336; color:white; margin-left:10px;" />
 
-                        <h:commandButton value="Reject"
-                                         action="#{orderBean.rejectPrescription(i.medicineId.medicineId)}"
-                                         rendered="#{orderBean.getPrescription(i.medicineId.medicineId).status eq 'PENDING'}"
-                                         style="background:#f44336; color:white; padding:5px 12px; border-radius:5px; margin-left:10px;" />
+</h:form>
 
-                    </h:form>
+
                 </ui:fragment>
 
             </h:panelGroup>

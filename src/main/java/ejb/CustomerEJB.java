@@ -449,8 +449,14 @@ public Orders getOrderDetails(Integer orderId, Integer userId) {
     q.setParameter("userId", userId);
     return q.getResultStream().findFirst().orElse(null);
 }
+// ✅ FIXED VERSION
 @Override
-public Integer savePrescription(Integer userId, Integer medicineId, String filePath, String fileType) {
+
+public Integer savePrescription(Integer userId,
+                                Integer orderId,
+                                Integer medicineId,
+                                String filePath,
+                                String fileType) {
 
     Users user = em.find(Users.class, userId);
     Medicines med = em.find(Medicines.class, medicineId);
@@ -462,6 +468,12 @@ public Integer savePrescription(Integer userId, Integer medicineId, String fileP
     p.setFileType(fileType);
     p.setStatus("PENDING");
     p.setUploadedAt(new Date());
+
+    // ✅ ONLY set order if it exists
+    if (orderId != null) {
+        Orders order = em.find(Orders.class, orderId);
+        p.setOrderId(order);
+    }
 
     em.persist(p);
     em.flush();
@@ -506,13 +518,12 @@ public void updateOrderStatus(Integer orderId, String newStatus) {
 
             if (Boolean.TRUE.equals(med.getPrescriptionRequired())) {
 
-                Prescription p = em.createQuery(
-                        "SELECT p FROM Prescription p " +
-                        "WHERE p.userId.userId = :uid " +
-                        "AND p.medicineId.medicineId = :mid",
-                        Prescription.class)
-                        .setParameter("uid", order.getUserId().getUserId())
-                        .setParameter("mid", med.getMedicineId())
+               Prescription p = em.createQuery(
+    "SELECT p FROM Prescription p WHERE p.orderId.orderId = :oid AND p.medicineId.medicineId = :mid",
+    Prescription.class)
+    .setParameter("oid", order.getOrderId())
+    .setParameter("mid", med.getMedicineId())
+
                         .getResultStream()
                         .findFirst()
                         .orElse(null);

@@ -49,7 +49,7 @@ List<Orders> getAllOrders();
   List<Orders> getOrderHistory(Integer userId);
     Orders getOrderDetails(Integer orderId, Integer userId);
 String registerCustomer(String username, String email, String phone, String password);
- Integer savePrescription(Integer userId, Integer medicineId, String filePath, String fileType) ;
+ Integer savePrescription(Integer userId,Integer orderId, Integer medicineId, String filePath, String fileType) ;
 
     // Cart Quantity Controls
     Integer getCartItemQuantity(int userId, int medicineId);

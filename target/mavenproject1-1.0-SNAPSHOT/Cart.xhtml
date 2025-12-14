@@ -176,6 +176,32 @@
                                    actionListener="#{cartBean.remove(ci.cartItemId)}"
                                    update="@form"/>
                 </div>
+                <!-- PRESCRIPTION HANDLING -->
+<h:panelGroup rendered="#{ci.medicineId.prescriptionRequired}">
+
+    <!-- Badge -->
+    <span class="prescription-badge prescription-required">
+        Prescription Required
+    </span>
+    <br/>
+
+    <!-- Upload button -->
+    <p:commandButton value="Upload Prescription"
+                     icon="pi pi-upload"
+                     style="margin-top:8px; background:#ff9800; color:white;"
+                     actionListener="#{cartBean.preparePrescriptionUpload(ci.medicineId.medicineId)}"
+                     oncomplete="PF('prescDialogVar').show()"
+                     process="@this"
+                     update=":prescForm" />
+</h:panelGroup>
+
+<!-- WHEN NOT REQUIRED -->
+<h:panelGroup rendered="#{!ci.medicineId.prescriptionRequired}">
+    <span class="prescription-badge prescription-not-required">
+        No Prescription Needed
+    </span>
+</h:panelGroup>
+
             </div>
 
             <!-- PRICE -->

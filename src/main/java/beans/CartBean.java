@@ -16,7 +16,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import org.primefaces.PrimeFaces;
+//import org.primefaces.model.file.UploadedFile;
 import org.primefaces.model.file.UploadedFile;
+
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.File;
@@ -56,37 +58,43 @@ public UploadedFile getUploadedPrescription() { return uploadedPrescription; }
 public void setUploadedPrescription(UploadedFile uploadedPrescription) { this.uploadedPrescription = uploadedPrescription; }
 public void preparePrescriptionUpload(Integer medicineId) {
     this.uploadMedicineId = medicineId;
-}
-public void uploadPrescription() {
+}public void uploadPrescription() {
+
     try {
         if (uploadedPrescription == null) {
             addMessage("Please choose a file!");
             return;
         }
-System.out.println("Uploaded file = " + uploadedPrescription);
 
-//      String folder = "D:/java/yashi_pro_copy/src/main/webapp/prescriptions/";\String folder = "D:/pharmacy_uploads/prescriptions/";
-String folder = "D:/java/yasi/prescriptions/";
+        // ✅ FINAL STORAGE LOCATION
+        String folderPath = "D:/java/yasi/prescriptions/";
 
-        File dir = new File(folder);
-        if (!dir.exists()) dir.mkdirs();
-
-        String fileName = System.currentTimeMillis() + "_" + uploadedPrescription.getFileName();
-        File file = new File(dir, fileName);
-
-        InputStream in = uploadedPrescription.getInputStream();
-        FileOutputStream out = new FileOutputStream(file);
-
-        byte[] buffer = new byte[1024];
-        int len;
-        while ((len = in.read(buffer)) != -1) {
-            out.write(buffer, 0, len);
+        File folder = new File(folderPath);
+        if (!folder.exists()) {
+            folder.mkdirs();
         }
-        out.close();
-        in.close();
 
+        // ✅ Safe filename
+        String fileName = System.currentTimeMillis() + "_" +
+                          uploadedPrescription.getFileName();
+
+        File targetFile = new File(folder, fileName);
+
+        try (InputStream in = uploadedPrescription.getInputStream();
+             FileOutputStream out = new FileOutputStream(targetFile)) {
+
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+        }
+
+        // ✅ SAVE ONLY FILE NAME IN DB
         customerEJB.savePrescription(
             loginBean.getLoggedUser().getUserId(),
+                null,
             uploadMedicineId,
             fileName,
             uploadedPrescription.getContentType()
@@ -95,9 +103,11 @@ String folder = "D:/java/yasi/prescriptions/";
         addMessage("Prescription uploaded successfully!");
 
     } catch (Exception e) {
+        e.printStackTrace();
         addMessage("Upload failed: " + e.getMessage());
     }
 }
+
 private void addMessage(String msg) {
     FacesMessage m = new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null);
     FacesContext.getCurrentInstance().addMessage(null, m);
