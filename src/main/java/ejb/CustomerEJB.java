@@ -351,7 +351,7 @@ public Orders placeOrderFromCart(Integer userId, Integer shippingAddressId, Stri
     order.setUserId(user);
     order.setDeliveryAddressId(address);
     order.setOrderDate(new Date());
-    order.setStatus("PLACED");
+    order.setStatus("waiting");
     order.setPaymentMethod(paymentMethod);
 
     // ⭐ APPLY OFFER ID TO ORDER
