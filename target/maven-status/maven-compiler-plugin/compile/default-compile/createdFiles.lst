@@ -19,6 +19,7 @@ com\mycompany\mavenproject1\resources\SecureResource.class
 filter\NoCacheFilter.class
 beans\OrderBean.class
 ejb\SecureBean.class
+ejb\PrescriptionEJBLocal.class
 entity\Roles.class
 rest\AuthREST$UserLogin.class
 servlets\PrescriptionServlet.class
@@ -30,6 +31,7 @@ entity\Medicines.class
 servlets\ReceiptServlet.class
 beans\AdminBean.class
 entity\Payments.class
+ejb\PrescriptionEJB.class
 record\KeepRecord.class
 entity\Manufacturers.class
 entity\Offers.class
