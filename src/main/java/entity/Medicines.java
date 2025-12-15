@@ -121,13 +121,13 @@ private String description;
 @Column(name = "pack_of")
 private Integer packOf;
 @Column(name = "prescription_required")
-private Boolean prescriptionRequired;
+private boolean prescriptionRequired;
 
-    public Boolean getPrescriptionRequired() {
+    public boolean isPrescriptionRequired() {
         return prescriptionRequired;
     }
 
-    public void setPrescriptionRequired(Boolean prescriptionRequired) {
+    public void setPrescriptionRequired(boolean prescriptionRequired) {
         this.prescriptionRequired = prescriptionRequired;
     }
 

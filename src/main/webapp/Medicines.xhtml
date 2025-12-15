@@ -219,6 +219,12 @@
             <p:column headerText="Expiry Date">
                 <h:outputText value="#{m.expiryDate}" />
             </p:column>
+<p:column headerText="Prescription Required">
+    <h:outputText 
+        value="#{m.prescriptionRequired ? 'Yes' : 'No'}"
+        style="font-weight:bold;
+               color:#{m.prescriptionRequired ? 'red' : 'green'}"/>
+</p:column>
 
             <p:column headerText="Description" style="max-width:200px; white-space:normal;">
                 <h:outputText value="#{m.description}" />
@@ -298,6 +304,9 @@
                                    itemValue="#{c.categoryId}"
                                    itemLabel="#{c.name}"/>
                 </p:selectOneMenu>
+<h:outputLabel value="Prescription Required:"/>
+<p:selectBooleanCheckbox 
+    value="#{adminBean.selectedMedicine.prescriptionRequired}" />
 
                 <h:outputLabel value="Manufacturer:"/>
                 <p:selectOneMenu value="#{adminBean.selectedManufacturerId}">

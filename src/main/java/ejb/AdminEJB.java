@@ -221,7 +221,7 @@ public List<Manufacturers> searchManufacturersByName(String name) {
 //    @RolesAllowed("Admin") 
 public void addMedicine(String name, String brand, BigDecimal price, int stock, 
                         LocalDate expiryDate, Integer categoryId, Integer manufacturerId,
-                        Integer packOf, String description, String picture) {
+                        Integer packOf, String description, String picture,boolean prescriptionRequired) {
 
     
     Categories category = em.find(Categories.class, categoryId);
@@ -236,6 +236,7 @@ public void addMedicine(String name, String brand, BigDecimal price, int stock,
     m.setPackOf(packOf);       
     m.setDescription(description);
     m.setPicture(picture);
+    m.setPrescriptionRequired(prescriptionRequired);
 
     m.setCategoryId(category);
     m.setManufacturerId(manufacturer);
@@ -258,7 +259,7 @@ manufacturer.setMedicinesCollection(manufacturerMedicines);
 //    @RolesAllowed("Admin") 
 public void updateMedicine(Integer medicineId, String name, String brand, BigDecimal price, int stock,
                            LocalDate expiryDate, Integer categoryId, Integer manufacturerId,
-                           Integer packOf, String description, String picture) {
+                           Integer packOf, String description, String picture,boolean prescriptionRequired) {
 
     Medicines m = em.find(Medicines.class, medicineId);
     if (m == null) {
@@ -272,6 +273,8 @@ public void updateMedicine(Integer medicineId, String name, String brand, BigDec
     m.setExpiryDate(expiryDate);
     m.setPackOf(packOf);
     m.setDescription(description);
+//    m.setOrderItemsCollection(orderItemsCollection);
+m.setPrescriptionRequired(prescriptionRequired);
     
     if (picture != null && !picture.isEmpty()) {
         m.setPicture(picture);

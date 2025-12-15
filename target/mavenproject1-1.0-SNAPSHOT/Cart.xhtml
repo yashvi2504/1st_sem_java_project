@@ -209,10 +209,12 @@
     </ui:repeat>
 
     <!-- SUBTOTAL -->
-    <div class="subtotal">
-        Subtotal (#{cartBean.itemCount} items): ₹#{cartBean.total}
+   <!-- SUBTOTAL -->
+<div class="subtotal">
+    Subtotal (#{cartBean.itemCount} items):
+    ₹#{cartBean.subTotal}
+</div>
 
-      </div>
 <h3 style="margin-left:40px; margin-top:20px;">
     Delivery Address
 </h3>
@@ -259,6 +261,12 @@
         <h3 style="margin-left:40px; margin-top:20px;">
             Total: ₹#{cartBean.total}
         </h3>
+        <h:panelGroup rendered="#{cartBean.appliedOffer != null}">
+    <div style="text-align:right; color:green; font-size:16px;">
+        Discount applied 🎉
+    </div>
+</h:panelGroup>
+
 
         <h3 style="margin-left:40px; margin-top:20px;">Choose Payment Method</h3>
 
@@ -267,13 +275,12 @@
             <f:selectItem itemLabel="Online Payment" itemValue="ONLINE" />
         </p:selectOneRadio>
 
-        <p:commandButton value="Place Order"
-                         icon="pi pi-check"
-                         actionListener="#{cartBean.confirmOrder}"
-                         update="mainForm"
-                         oncomplete="if (args.showAddressDialog) PF('addressDlg').show();"
-                         style="margin-left:40px; margin-top:10px;
-                                 background:#01756e; color:white; padding:10px 20px;" />
+<p:commandButton value="Place Order"
+    icon="pi pi-check"
+    action="#{cartBean.confirmOrder}"
+    update="mainForm"
+    style="margin-left:40px; margin-top:10px;
+           background:#01756e; color:white; padding:10px 20px;" />
 
     </h:form>
 

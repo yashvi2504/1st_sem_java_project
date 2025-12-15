@@ -51,11 +51,11 @@ List<Categories> searchCategoriesByName(String name);
 
  void addMedicine(String name, String brand, BigDecimal price, int stock,
                      LocalDate expiryDate, Integer categoryId, Integer manufacturerId,
-                     Integer packOf, String description, String picture);
+                     Integer packOf, String description, String picture,boolean prescriptionRequired);
 
 void updateMedicine(Integer medicineId, String name, String brand, BigDecimal price, int stock,
                         LocalDate expiryDate, Integer categoryId, Integer manufacturerId,
-                        Integer packOf, String description, String picture);
+                        Integer packOf, String description, String picture,boolean prescriptionRequired);
 
 void deleteMedicine(Integer medicineId);
 

@@ -56,7 +56,14 @@ public void init() {
     if (list != null && !list.isEmpty()) {
         selectedAddress = list.get(list.size() - 1); // Last address as default
     }
+}public Addresses getSelectedAddress() {
+    return selectedAddress;
 }
+
+public void setSelectedAddress(Addresses selectedAddress) {
+    this.selectedAddress = selectedAddress;
+}
+
 
     public String register() {
 
@@ -167,7 +174,7 @@ public void addToCart(Integer medicineId) {
     // ---------------------------------------------------------
 
     // address getters
-    public Addresses getSelectedAddress() { return selectedAddress; }
+//    public Addresses getSelectedAddress() { return selectedAddress; }
     public Integer getSelectedAddressId() { return selectedAddressId; }
     public String getStreet() { return street; }
     public String getCity() { return city; }

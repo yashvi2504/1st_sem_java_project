@@ -312,6 +312,7 @@ public List<Addresses> getAddressesByUserId(Integer userId) {
 // ===================== ORDER MANAGEMENT =====================
 
 @Override
+//@Override
 public Orders placeOrderFromCart(Integer userId, Integer shippingAddressId, String paymentMethod, Integer offerId) {
 
     Users user = em.find(Users.class, userId);

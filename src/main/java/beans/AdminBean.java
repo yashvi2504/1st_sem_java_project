@@ -459,7 +459,8 @@ public void saveMedicine() {
                         selectedManufacturerId,
                         selectedMedicine.getPackOf(),
                         selectedMedicine.getDescription(),
-                        uploadedFileName
+                        uploadedFileName,
+                        selectedMedicine.isPrescriptionRequired()
                 );
             } else {
                 // UPDATE MEDICINE
@@ -474,7 +475,8 @@ public void saveMedicine() {
                         selectedManufacturerId,
                         selectedMedicine.getPackOf(),
                         selectedMedicine.getDescription(),
-                        uploadedFileName
+                        uploadedFileName,
+                        selectedMedicine.isPrescriptionRequired()
                 );
             }
 

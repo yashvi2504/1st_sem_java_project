@@ -126,6 +126,19 @@ public void uploadPrescription() {
         addMessage("Upload failed!");
     }
 }
+public double getSubTotal() {
+    if (cartItems == null) return 0;
+    double sum = 0;
+    for (CartItems ci : cartItems) {
+        sum += ci.getPricePerUnit() * ci.getQuantity();
+    }
+    return sum;
+}
+
+public double getTotal() {
+    return discountedTotal; // already calculated after offers
+}
+
 public int getItemCount() {
     if (cartItems == null) {
         return 0;
@@ -146,7 +159,7 @@ public boolean isPrescriptionRequiredButNotUploaded() {
 
     for (CartItems ci : cartItems) {
         if (ci.getMedicineId() != null &&
-            Boolean.TRUE.equals(ci.getMedicineId().getPrescriptionRequired())) {
+            Boolean.TRUE.equals(ci.getMedicineId().isPrescriptionRequired())) {
 
             // if order not placed OR prescription not uploaded
             if (lastPlacedOrderId == null) {
@@ -178,59 +191,6 @@ public void loadCart() {
     applyBestOffer();
 }
 
-private void applyBestOffer() {
-
-    appliedOffer = null;
-    discountedTotal = activeCart != null ? activeCart.getTotalAmount() : 0;
-
-    List<Offers> offers = new ArrayList<>(customerEJB.getActiveOffers());
-    double cartTotal = activeCart != null ? activeCart.getTotalAmount() : 0;
-
-    double bestDiscount = 0;
-
-    for (Offers o : offers) {
-
-        // ⭐ Convert BigDecimal → double safely
-        double minAmount = (o.getMinOrderAmount() == null)
-                ? 0
-                : o.getMinOrderAmount().doubleValue();
-
-        // ⭐ FIX 1 — Compare double < double
-        if (cartTotal < minAmount) {
-            continue;
-        }
-
-        // ⭐ Medicine-specific offer check
-        if (o.getMedicineId() != null) {
-            boolean found = cartItems.stream()
-                .anyMatch(ci -> ci.getMedicineId().getMedicineId()
-                        .equals(o.getMedicineId().getMedicineId()));
-
-            if (!found) continue;
-        }
-
-        double discount = 0;
-
-        if ("PERCENT".equals(o.getDiscountType())) {
-
-            // ⭐ FIX 2 — BigDecimal → double before division
-            discount = cartTotal * (o.getDiscountValue().doubleValue() / 100.0);
-
-        } else if ("FIXED".equals(o.getDiscountType())) {
-
-            // ⭐ FIX 3 — Convert BigDecimal → double
-            discount = o.getDiscountValue().doubleValue();
-        }
-
-        if (discount > bestDiscount) {
-            bestDiscount = discount;
-            appliedOffer = o;
-        }
-    }
-
-    discountedTotal = cartTotal - bestDiscount;
-    if (discountedTotal < 0) discountedTotal = 0;
-}
 
     // =============== REMOVE ITEM =================
     public void remove(Integer cartItemId) {
@@ -238,17 +198,20 @@ private void applyBestOffer() {
         customerEJB.removeCartItem(loginBean.getLoggedUser().getUserId(), cartItemId);
         loadCart();
     }
-    
-  public void confirmOrder() {
+    public void confirmOrder() {
 
-    // ✅ 1. If cart is empty → DO NOTHING
     if (cartItems == null || cartItems.isEmpty()) {
-        return; // ⛔ no message, no error popup
+        addMessage("Your cart is empty");
+        return;
     }
 
-    // ✅ 2. Address safety (auto-selected or existing)
     if (customerBean.getSelectedAddress() == null) {
         addMessage("Please add or select an address");
+        return;
+    }
+
+    if (paymentMethod == null || paymentMethod.isBlank()) {
+        addMessage("Please select a payment method");
         return;
     }
 
@@ -258,23 +221,31 @@ private void applyBestOffer() {
         Integer offerId = appliedOffer != null ? appliedOffer.getOfferId() : null;
 
         Orders order = customerEJB.placeOrderFromCart(
-                userId, addressId, paymentMethod, offerId
+                userId,
+                addressId,
+                paymentMethod,
+                offerId
         );
 
         lastPlacedOrderId = order.getOrderId();
 
-        customerEJB.attachUploadedPrescriptionsToOrder(userId, lastPlacedOrderId);
-        customerEJB.attachPrescriptionToOrder(userId, lastPlacedOrderId);
+        customerEJB.attachUploadedPrescriptionsToOrder(
+                userId,
+                lastPlacedOrderId
+        );
 
         addMessage("Order placed successfully!");
         loadCart();
 
     } catch (Exception e) {
-        // ❌ REMOVE cart empty error
-        if (!e.getMessage().contains("Cart is empty")) {
-            addMessage("Order failed");
-        }
-    }
+    e.printStackTrace();
+
+    addMessage(
+        "Order failed: " + 
+        (e.getMessage() != null ? e.getMessage() : e.getClass().getName())
+    );
+}
+
 }
 
     // =============== GETTERS & SETTERS ===============
@@ -308,9 +279,7 @@ private void applyBestOffer() {
         return activeCart;
     }
 
-   public double getTotal() {
-    return discountedTotal;
-}
+
 
     // ⭐ For Radio Button Binding
     public String getPaymentMethod() {
@@ -334,6 +303,43 @@ private void applyBestOffer() {
             "Added to Cart!", null));
 }
 // ------------------- GETTERS & SETTERS -------------------
+private void applyBestOffer() {
+
+    appliedOffer = null;
+
+    double cartTotal = getSubTotal();   // ✅ USE subtotal
+    discountedTotal = cartTotal;        // ✅ DEFAULT
+
+    List<Offers> offers = new ArrayList<>(customerEJB.getActiveOffers());
+
+    double bestDiscount = 0;
+
+    for (Offers o : offers) {
+
+        double minAmount = o.getMinOrderAmount() != null
+                ? o.getMinOrderAmount().doubleValue()
+                : 0;
+
+        if (cartTotal < minAmount) continue;
+
+        double discount = 0;
+
+        if ("PERCENT".equals(o.getDiscountType())) {
+            discount = cartTotal * (o.getDiscountValue().doubleValue() / 100);
+        } else if ("FIXED".equals(o.getDiscountType())) {
+            discount = o.getDiscountValue().doubleValue();
+        }
+
+        if (discount > bestDiscount) {
+            bestDiscount = discount;
+            appliedOffer = o;
+        }
+    }
+
+    discountedTotal = cartTotal - bestDiscount;
+
+    if (discountedTotal < 0) discountedTotal = 0;
+}
 
 public Offers getAppliedOffer() {
     return appliedOffer;
